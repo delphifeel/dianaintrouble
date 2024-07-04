@@ -70,7 +70,7 @@ pub fn init_aligned(text: string_view, font_size: FontSize, bounds: rl.Rectangle
     };
 }
 
-pub fn init(text: string, font_size: FontSize, pos: rl.Vector2) Text {
+pub fn init(text: string_view, font_size: FontSize, pos: rl.Vector2) Text {
     var font = fonts.get_font(font_size);
     return Text{
         .text = text,

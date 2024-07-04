@@ -9,6 +9,7 @@ const debug_info = @import("debug_info.zig");
 const fonts = @import("gui/fonts.zig");
 const Background = @import("background.zig");
 const Player = @import("player.zig");
+const Enemies = @import("enemies.zig");
 
 // ---+---+--- helpers imports ---+---+---
 const helpers = @import("helpers.zig");
@@ -28,7 +29,7 @@ pub fn main() !void {
     rl.SetTraceLogLevel(rl.LOG_WARNING);
     screen.init();
     defer screen.deinit();
-    rl.SetTargetFPS(120);
+    rl.SetTargetFPS(rutils.TARGET_FPS);
 
     fonts.load_fonts(allocator);
     defer fonts.unload_fonts();
@@ -37,7 +38,8 @@ pub fn main() !void {
         .offset = screen.Center,
         .target = rm.Vector2Zero(),
         .rotation = 0.0,
-        .zoom = 0.5,
+        // TODO: zoom need to be related to resolution
+        .zoom = 0.6,
     };
 
     var background = Background.init();
@@ -45,6 +47,10 @@ pub fn main() !void {
 
     var player = Player.init(rutils.calc_rect_center(background.transform));
     defer player.deinit();
+
+    var player_pos = rutils.calc_rect_center(player.transform);
+    var enemies = Enemies.spawn(allocator, player_pos);
+    defer enemies.deinit();
 
     while (!rl.WindowShouldClose()) {
 
@@ -55,7 +61,10 @@ pub fn main() !void {
             }
 
             player.update();
+            player_pos = rutils.calc_rect_center(player.transform);
             camera.target = rutils.calc_rect_center(player.transform);
+
+            enemies.update(&player);
         }
 
         // ------------------------------- DRAW -------------------------------
@@ -65,6 +74,7 @@ pub fn main() !void {
         rl.BeginMode2D(camera);
         {
             background.draw();
+            enemies.draw();
             player.draw();
         }
         rl.EndMode2D();

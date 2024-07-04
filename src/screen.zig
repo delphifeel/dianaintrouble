@@ -1,7 +1,9 @@
 const rl = @import("raylib.zig");
 
-const width: f32 = 1600;
-const height: f32 = 900;
+// const width: f32 = 1600;
+// const height: f32 = 900;
+const width: f32 = 1200;
+const height: f32 = 675;
 
 pub const Center = rl.Vector2{ .x = width / 2, .y = height / 2 };
 

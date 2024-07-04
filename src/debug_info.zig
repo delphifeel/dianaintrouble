@@ -13,6 +13,13 @@ inline fn rlMousePosInWorld(camera: rl.Camera2D) rl.Vector2 {
     return rl.GetScreenToWorld2D(rl.GetMousePosition(), camera);
 }
 
+pub var extra_info_buf: [128]u8 = undefined;
+var extra_info_c_buf: ?h.string_view = null;
+
+pub fn draw_extra_info(buf_c: h.string_view) void {
+    extra_info_c_buf = buf_c;
+}
+
 pub fn draw(camera: *const rl.Camera2D) void {
     var buf: [128]u8 = undefined;
     var pos_x: i32 = 10;
@@ -29,4 +36,10 @@ pub fn draw(camera: *const rl.Camera2D) void {
     str = fmt.bufPrintZ(&buf, "Mouse Pos World: {s}", .{fmtVec(rlMousePosInWorld(camera.*))}) catch unreachable;
     rl.DrawText(str, pos_x, pos_y, 20, rl.GREEN);
     pos_y += 30;
+
+    if (extra_info_c_buf) |s| {
+        rl.DrawText(s.ptr, pos_x, pos_y, 20, rl.RED);
+        extra_info_c_buf = null;
+        pos_y += 30;
+    }
 }

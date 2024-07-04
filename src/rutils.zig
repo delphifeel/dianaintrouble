@@ -2,6 +2,19 @@ const rl = @import("raylib.zig");
 const rm = @import("raymath.zig");
 const screen = @import("screen.zig");
 
+pub const TARGET_FPS = 120;
+const MAX_FPS = 120;
+
+// TODO: replace it with calc. speed m/s
+pub inline fn calc_fixed_speed(v: f32) f32 {
+    return MAX_FPS / TARGET_FPS * v;
+}
+
+pub fn change_rect_pos(rect: *rl.Rectangle, pos: rl.Vector2) void {
+    rect.x = pos.x;
+    rect.y = pos.y;
+}
+
 pub fn new_vector2(x: f32, y: f32) rl.Vector2 {
     return rl.Vector2{ .x = x, .y = y };
 }
