@@ -39,6 +39,8 @@ fn set_new_pos(self: *Self, player_center: rl.Vector2, frame_time: f32) void {
         self.transform.x = player_center.x - OFFSET_FROM_CENTER - SIZE / 2;
         self.transform.y = player_center.y - OFFSET_FROM_CENTER - SIZE / 2;
     }
+
+    self.collider = self.transform;
 }
 
 fn calc_start_pos(player_center: rl.Vector2) rl.Rectangle {

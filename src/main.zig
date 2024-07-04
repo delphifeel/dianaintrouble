@@ -48,7 +48,7 @@ pub fn main() !void {
     var player = Player.init(rutils.calc_rect_center(background.transform));
     defer player.deinit();
 
-    var player_pos = rutils.calc_rect_center(player.transform);
+    var player_pos = player.entity.position_center;
     var enemies = Enemies.spawn(allocator, player_pos);
     defer enemies.deinit();
 
@@ -61,8 +61,7 @@ pub fn main() !void {
             }
 
             player.update();
-            player_pos = rutils.calc_rect_center(player.transform);
-            camera.target = rutils.calc_rect_center(player.transform);
+            camera.target = player.entity.position_center;
 
             enemies.update(&player);
         }

@@ -8,14 +8,15 @@ const rutils = @import("rutils.zig");
 // ---+---+---+---+---+---
 
 const Enemy = @import("enemy.zig");
+const Entity = @import("entity.zig");
 const Player = @import("player.zig");
 
 const Enemies = @This();
 
 list: std.ArrayList(Enemy),
 
-const ENEMIES_COUNT: f32 = 1000;
-const RECT_SIDE_SIZE: f32 = 2300;
+const ENEMIES_COUNT: f32 = 100;
+const RECT_SIDE_SIZE: f32 = 1300;
 
 // spawn in rectange from player pos
 pub fn spawn(allocator: std.mem.Allocator, player_pos: rl.Vector2) Enemies {
@@ -76,7 +77,11 @@ pub fn deinit(self: *Enemies) void {
 
 pub fn update(self: *Enemies, player: *Player) void {
     for (self.list.items) |*enemy| {
-        enemy.update(player);
+        if (rl.CheckCollisionRecs(enemy.entity.collider, player.player_projectile.collider)) {
+            enemy.entity.try_hit(10);
+        }
+
+        enemy.update(&player.entity);
     }
 }
 
