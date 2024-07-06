@@ -19,13 +19,9 @@ transform: rl.Rectangle,
 position_center: rl.Vector2,
 collider: rl.Rectangle,
 health: i32,
+is_dead: bool,
 is_invurnable: bool,
 hit_time_passed: f32,
-
-// TODO: should be private
-pub fn is_dead(self: *const Self) bool {
-    return self.health <= 0;
-}
 
 const HIT_TIMEOUT: f32 = 0.4;
 
@@ -41,6 +37,10 @@ pub fn try_hit(self: *Self, dmg: i32) void {
     self.health -= dmg;
     self.is_invurnable = true;
     self.hit_time_passed = 0;
+
+    if (self.health <= 0) {
+        self.is_dead = true;
+    }
 }
 
 pub fn init(pos: rl.Vector2, size: f32, start_health: i32) Self {
@@ -51,6 +51,7 @@ pub fn init(pos: rl.Vector2, size: f32, start_health: i32) Self {
         .position_center = position_center,
         .collider = transform,
         .health = start_health,
+        .is_dead = false,
         .is_invurnable = false,
         .hit_time_passed = 0,
     };
@@ -59,7 +60,7 @@ pub fn init(pos: rl.Vector2, size: f32, start_health: i32) Self {
 pub fn deinit(_: *Self) void {}
 
 pub fn update(self: *Self, move_offset: rl.Vector2) void {
-    if (self.is_dead()) {
+    if (self.is_dead) {
         return;
     }
     var new_move_offset = move_offset;
@@ -86,7 +87,7 @@ pub fn update(self: *Self, move_offset: rl.Vector2) void {
 
 pub fn draw(self: *const Self, base_color: rl.Color) void {
     var color = base_color;
-    if (self.is_dead()) {
+    if (self.is_dead) {
         color = rl.BLACK;
     } else if (self.is_invurnable) {
         color = rl.Fade(color, 0.2);

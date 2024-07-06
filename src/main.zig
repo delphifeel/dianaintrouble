@@ -81,6 +81,7 @@ pub fn main() !void {
         }
         rl.EndMode2D();
 
+        player.draw_exp_progress();
         screen.draw_fps();
         debug_info.draw(&camera);
 

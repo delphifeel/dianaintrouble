@@ -77,8 +77,16 @@ pub fn deinit(self: *Enemies) void {
 
 pub fn update(self: *Enemies, player: *Player) void {
     for (self.list.items) |*enemy| {
+        if (enemy.entity.is_dead) {
+            continue;
+        }
+
         if (rl.CheckCollisionRecs(enemy.entity.collider, player.player_projectile.collider)) {
-            enemy.entity.try_hit(10);
+            const entity = &enemy.entity;
+            entity.try_hit(10);
+            if (entity.is_dead) {
+                player.up_exp();
+            }
         }
 
         enemy.update(&player.entity);

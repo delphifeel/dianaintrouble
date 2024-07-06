@@ -30,7 +30,7 @@ pub fn update(self: *Self, player_entity: *Entity) void {
     const step_vec = rm.Vector2Normalize(diff);
     const move_offset = rutils.new_vector2(step_vec.x * step, step_vec.y * step);
 
-    if (!self.entity.is_dead()) {
+    if (!self.entity.is_dead) {
         if (rl.CheckCollisionRecs(self.entity.collider, player_entity.collider)) {
             player_entity.try_hit(1);
         }

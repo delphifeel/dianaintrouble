@@ -65,7 +65,7 @@ pub fn new_rect_at_left(width: f32, height: f32) rl.Rectangle {
 }
 
 pub fn new_rect_at_top(width: f32, height: f32) rl.Rectangle {
-    return new_rect(0, screen.Center.y - height / 2, width, height);
+    return new_rect(screen.Center.x - width / 2, 0, width, height);
 }
 
 pub fn new_rect_at_right(width: f32, height: f32) rl.Rectangle {
@@ -85,14 +85,15 @@ pub fn calc_rect_center(rect: rl.Rectangle) rl.Vector2 {
     return new_vector2(rect.x + rect.width / 2, rect.y + rect.height / 2);
 }
 
-// pub fn RectWithPadding(rect rl.Rectangle, xPadding float32, yPadding float32) rl.Rectangle {
-// 	rect.X += xPadding
-// 	rect.Width -= xPadding * 2
+pub fn rect_with_padding(old_rect: rl.Rectangle, x_padding: f32, y_padding: f32) rl.Rectangle {
+    var rect = old_rect;
+    rect.x += x_padding;
+    rect.width -= x_padding * 2;
 
-// 	rect.Y += yPadding
-// 	rect.Height -= yPadding * 2
-// 	return rect
-// }
+    rect.y += y_padding;
+    rect.height -= y_padding * 2;
+    return rect;
+}
 
 // pub fn RectWithPaddingEx(rect rl.Rectangle, top float32, right float32, bottom float32, left float32) rl.Rectangle {
 // 	rect.X += left
