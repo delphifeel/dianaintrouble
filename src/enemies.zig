@@ -16,7 +16,7 @@ const Enemies = @This();
 list: std.ArrayList(Enemy),
 
 const ENEMIES_COUNT: f32 = 100;
-const RECT_SIDE_SIZE: f32 = 1300;
+const RECT_SIDE_SIZE: f32 = 200;
 
 // spawn in rectange from player pos
 pub fn spawn(allocator: std.mem.Allocator, player_pos: rl.Vector2) Enemies {

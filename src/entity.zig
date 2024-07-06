@@ -10,6 +10,7 @@ const debug_info = @import("debug_info.zig");
 const Text = @import("gui/text.zig");
 const fonts = @import("gui/fonts.zig");
 const SelfProjectile = @import("player_projectile.zig");
+const Background = @import("background.zig");
 
 const Self = @This();
 
@@ -61,11 +62,18 @@ pub fn update(self: *Self, move_offset: rl.Vector2) void {
     if (self.is_dead()) {
         return;
     }
+    var new_move_offset = move_offset;
+    if ((new_move_offset.x != 0) and (new_move_offset.y != 0)) {
+        new_move_offset.x *= 0.7;
+        new_move_offset.y *= 0.7;
+    }
 
-    self.transform.x += move_offset.x;
-    self.transform.y += move_offset.y;
-    self.collider = self.transform;
-    self.position_center = rutils.calc_rect_center(self.transform);
+    const new_transform = rutils.move_rect(self.transform, move_offset);
+    if (!rutils.is_rect_out_of_rect(new_transform, Background.transform)) {
+        self.transform = new_transform;
+        self.collider = self.transform;
+        self.position_center = rutils.calc_rect_center(self.transform);
+    } else {}
 
     if (self.is_invurnable) {
         self.hit_time_passed += rl.GetFrameTime();
@@ -81,7 +89,7 @@ pub fn draw(self: *const Self, base_color: rl.Color) void {
     if (self.is_dead()) {
         color = rl.BLACK;
     } else if (self.is_invurnable) {
-        color = rl.GRAY;
+        color = rl.Fade(color, 0.2);
     }
     rl.DrawRectangleRec(self.transform, color);
 }

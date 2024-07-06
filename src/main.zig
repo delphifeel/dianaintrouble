@@ -1,3 +1,7 @@
+// Check list for prod:
+// - Coords system
+// - Diff. resolutions
+
 const std = @import("std");
 const debug = std.debug;
 const fmt = std.fmt;
@@ -38,14 +42,13 @@ pub fn main() !void {
         .offset = screen.Center,
         .target = rm.Vector2Zero(),
         .rotation = 0.0,
-        // TODO: zoom need to be related to resolution
-        .zoom = 0.6,
+        .zoom = screen.camera_zoom,
     };
 
     var background = Background.init();
     defer background.deinit();
 
-    var player = Player.init(rutils.calc_rect_center(background.transform));
+    var player = Player.init(rutils.calc_rect_center(Background.transform));
     defer player.deinit();
 
     var player_pos = player.entity.position_center;

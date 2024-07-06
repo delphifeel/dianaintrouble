@@ -1,13 +1,42 @@
+const std = @import("std");
 const rl = @import("raylib.zig");
 const rm = @import("raymath.zig");
 const screen = @import("screen.zig");
 
 pub const TARGET_FPS = 120;
-const MAX_FPS = 120;
 
-// TODO: replace it with calc. speed m/s
-pub inline fn calc_fixed_speed(v: f32) f32 {
-    return MAX_FPS / TARGET_FPS * v;
+pub fn print_rect(rect: rl.Rectangle) void {
+    std.debug.print("{d} : {d} : {d} : {d}\n", .{ rect.x, rect.y, rect.width, rect.height });
+}
+
+pub inline fn distance_by_speed(speed: f32, last_frame_time: f32) f32 {
+    // d = v * t
+    return speed * last_frame_time;
+}
+
+// TODO: we compare as ints but this can cause problems
+pub fn is_rect_out_of_rect(r1: rl.Rectangle, r2: rl.Rectangle) bool {
+    if (r1.x < r2.x) {
+        return true;
+    }
+    if (r1.y < r2.y) {
+        return true;
+    }
+    if (r1.x + r1.width > r2.x + r2.width) {
+        return true;
+    }
+    if (r1.y + r1.height > r2.y + r2.height) {
+        return true;
+    }
+
+    return false;
+}
+
+pub fn move_rect(old_rect: rl.Rectangle, offset: rl.Vector2) rl.Rectangle {
+    var rect = old_rect;
+    rect.x += offset.x;
+    rect.y += offset.y;
+    return rect;
 }
 
 pub fn change_rect_pos(rect: *rl.Rectangle, pos: rl.Vector2) void {

@@ -3,7 +3,7 @@ const rl = @import("raylib.zig");
 const rm = @import("raymath.zig");
 
 // ---+---+--- helpers imports ---+---+---
-const helpers = @import("helpers.zig");
+const h = @import("helpers.zig");
 const rutils = @import("rutils.zig");
 // ---+---+---+---+---+---
 const debug_info = @import("debug_info.zig");
@@ -11,6 +11,7 @@ const Text = @import("gui/text.zig");
 const fonts = @import("gui/fonts.zig");
 const SelfProjectile = @import("player_projectile.zig");
 const Entity = @import("entity.zig");
+const Background = @import("background.zig");
 
 const Self = @This();
 
@@ -30,7 +31,8 @@ pub fn deinit(self: *Self) void {
 }
 
 pub fn update(self: *Self) void {
-    const step = rutils.calc_fixed_speed(1);
+    const delta = rl.GetFrameTime();
+    const step = rutils.distance_by_speed(80, delta);
     var pos_delta = rm.Vector2Zero();
     if (rl.IsKeyDown(rl.KEY_A)) {
         pos_delta.x -= step;
@@ -43,11 +45,6 @@ pub fn update(self: *Self) void {
     }
     if (rl.IsKeyDown(rl.KEY_S)) {
         pos_delta.y += step;
-    }
-
-    if ((pos_delta.x != 0) and (pos_delta.y != 0)) {
-        pos_delta.x *= 0.7;
-        pos_delta.y *= 0.7;
     }
 
     self.entity.update(pos_delta);
