@@ -14,7 +14,7 @@ entity: Entity,
 
 pub fn init(pos: rl.Vector2) Self {
     return Self{
-        .entity = Entity.init(pos, 50, 40),
+        .entity = Entity.init(pos, 50, 5000, rl.GREEN),
     };
 }
 

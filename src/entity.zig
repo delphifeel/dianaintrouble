@@ -20,8 +20,14 @@ position_center: rl.Vector2,
 collider: rl.Rectangle,
 health: i32,
 is_dead: bool,
+// was hit, and now invurnable
 is_invurnable: bool,
+
+hit_color: rl.Color,
 hit_time_passed: f32,
+hit_pos: rl.Vector2,
+hit_text: [4]u8,
+hit_text_slice: []u8,
 
 const HIT_TIMEOUT: f32 = 0.4;
 
@@ -34,16 +40,22 @@ pub fn try_hit(self: *Self, dmg: i32) void {
         return;
     }
 
+    self.hit(dmg);
+}
+
+fn hit(self: *Self, dmg: i32) void {
     self.health -= dmg;
     self.is_invurnable = true;
     self.hit_time_passed = 0;
+    self.hit_pos = rutils.new_vector2(self.transform.x + self.transform.width + 10, self.transform.y - 15);
+    self.hit_text_slice = std.fmt.bufPrint(&self.hit_text, "{d}", .{dmg}) catch unreachable;
 
     if (self.health <= 0) {
         self.is_dead = true;
     }
 }
 
-pub fn init(pos: rl.Vector2, size: f32, start_health: i32) Self {
+pub fn init(pos: rl.Vector2, size: f32, start_health: i32, hit_color: rl.Color) Self {
     const transform = rutils.new_rect(pos.x, pos.y, size, size);
     const position_center = rutils.calc_rect_center(transform);
     return Self{
@@ -54,6 +66,10 @@ pub fn init(pos: rl.Vector2, size: f32, start_health: i32) Self {
         .is_dead = false,
         .is_invurnable = false,
         .hit_time_passed = 0,
+        .hit_color = hit_color,
+        .hit_pos = undefined,
+        .hit_text = undefined,
+        .hit_text_slice = undefined,
     };
 }
 
@@ -78,7 +94,10 @@ pub fn update(self: *Self, move_offset: rl.Vector2) void {
 
     if (self.is_invurnable) {
         self.hit_time_passed += rl.GetFrameTime();
-        if (self.hit_time_passed >= HIT_TIMEOUT) {
+        if (self.hit_time_passed < HIT_TIMEOUT) {
+            self.hit_pos.y -= 1;
+            self.hit_pos.x += 0.2;
+        } else {
             self.is_invurnable = false;
             self.hit_time_passed = 0;
         }
@@ -93,4 +112,8 @@ pub fn draw(self: *const Self, base_color: rl.Color) void {
         color = rl.Fade(color, 0.2);
     }
     rl.DrawRectangleRec(self.transform, color);
+
+    if (self.is_invurnable) {
+        fonts.draw_text(self.hit_text_slice, self.hit_pos, fonts.FontSize.Bigger, self.hit_color);
+    }
 }

@@ -15,9 +15,16 @@ pub const FontSize = enum(i32) {
     Small = @intFromFloat(screen.remy(2.7)),
     Medium = @intFromFloat(screen.remy(4)),
     Big = @intFromFloat(screen.remy(5.26)),
+    Bigger = @intFromFloat(screen.remy(10)),
 };
 
 var fonts: std.AutoHashMap(FontSize, rl.Font) = undefined;
+
+// TODO: is it text module ?
+pub fn draw_text(text: string_view, pos: rl.Vector2, font_size: FontSize, color: rl.Color) void {
+    const font = get_font(font_size);
+    rl.DrawTextEx(font, text.ptr, pos, @floatFromInt(font.baseSize), 0, color);
+}
 
 pub fn get_font(font_size: FontSize) rl.Font {
     return fonts.get(font_size).?;
@@ -30,6 +37,7 @@ pub fn load_fonts(allocator: std.mem.Allocator) void {
     load_font(FontSize.Small);
     load_font(FontSize.Medium);
     load_font(FontSize.Big);
+    load_font(FontSize.Bigger);
 }
 
 pub fn unload_fonts() void {

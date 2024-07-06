@@ -45,7 +45,7 @@ fn init_progress_bar() Progressbar {
 }
 
 pub fn init(pos: rl.Vector2) Self {
-    const entity = Entity.init(pos, 50, 100);
+    const entity = Entity.init(pos, 50, 100, rl.RED);
     return Self{
         .entity = entity,
         .player_projectile = SelfProjectile.init(entity.position_center),
