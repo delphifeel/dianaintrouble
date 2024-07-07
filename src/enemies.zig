@@ -15,7 +15,7 @@ const Enemies = @This();
 
 list: std.ArrayList(Enemy),
 
-const ENEMIES_COUNT: f32 = 200;
+const ENEMIES_COUNT: f32 = 30;
 const RECT_SIDE_SIZE: f32 = 1200;
 
 // spawn in rectange from player pos
@@ -84,6 +84,13 @@ pub fn update(self: *Enemies, player: *Player) void {
         if (rl.CheckCollisionRecs(enemy.entity.collider, player.player_projectile.collider)) {
             const entity = &enemy.entity;
             entity.try_hit(10);
+            if (entity.is_dead) {
+                player.up_exp();
+            }
+        }
+        if (rl.CheckCollisionRecs(enemy.entity.collider, player.player_meteors.collider)) {
+            const entity = &enemy.entity;
+            entity.try_hit(20);
             if (entity.is_dead) {
                 player.up_exp();
             }

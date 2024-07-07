@@ -5,6 +5,31 @@ const screen = @import("screen.zig");
 
 pub const TARGET_FPS = 120;
 
+pub fn rand_float_normalized() f32 {
+    const v: f32 = @floatFromInt(rl.GetRandomValue(-100, 100));
+    return v / 100;
+}
+
+pub fn rand_coord_in_range(init_pos: rl.Vector2, min: f32, max: f32) rl.Vector2 {
+    var rand_f = rand_float_normalized();
+    var v = (max - min) * rand_f;
+    var new_x = init_pos.x;
+    if (v < 0) {
+        new_x -= min + v;
+    } else {
+        new_x += min + v;
+    }
+    rand_f = rand_float_normalized();
+    v = (max - min) * rand_f;
+    var new_y = init_pos.y;
+    if (v < 0) {
+        new_y -= min + v;
+    } else {
+        new_y += min + v;
+    }
+    return new_vector2(new_x, new_y);
+}
+
 pub fn print_rect(rect: rl.Rectangle) void {
     std.debug.print("{d} : {d} : {d} : {d}\n", .{ rect.x, rect.y, rect.width, rect.height });
 }
@@ -70,6 +95,14 @@ pub fn new_rect_at_top(width: f32, height: f32) rl.Rectangle {
 
 pub fn new_rect_at_right(width: f32, height: f32) rl.Rectangle {
     return new_rect(screen.Center.x * 2 - width, screen.Center.y - height / 2, width, height);
+}
+
+pub inline fn new_rect_with_pos(pos: rl.Vector2, width: f32, height: f32) rl.Rectangle {
+    return new_rect(pos.x, pos.y, width, height);
+}
+
+pub inline fn rect_pos(rect: rl.Rectangle) rl.Vector2 {
+    return new_vector2(rect.x, rect.y);
 }
 
 // pub fn CalcItemsSize(itemsCount int, itemSize float32, itemSpaceBetween float32) float32 {

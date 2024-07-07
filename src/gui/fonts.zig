@@ -21,9 +21,9 @@ pub const FontSize = enum(i32) {
 var fonts: std.AutoHashMap(FontSize, rl.Font) = undefined;
 
 // TODO: is it text module ?
-pub fn draw_text(text: string_view, pos: rl.Vector2, font_size: FontSize, color: rl.Color) void {
+pub fn draw_text(text: [:0]const u8, pos: rl.Vector2, font_size: FontSize, color: rl.Color) void {
     const font = get_font(font_size);
-    rl.DrawTextEx(font, text.ptr, pos, @floatFromInt(font.baseSize), 0, color);
+    rl.DrawTextEx(font, text, pos, @floatFromInt(font.baseSize), 0, color);
 }
 
 pub fn get_font(font_size: FontSize) rl.Font {

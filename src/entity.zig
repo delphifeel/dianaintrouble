@@ -27,7 +27,7 @@ hit_color: rl.Color,
 hit_time_passed: f32,
 hit_pos: rl.Vector2,
 hit_text: [4]u8,
-hit_text_slice: []u8,
+hit_text_slice: [:0]u8,
 
 const HIT_TIMEOUT: f32 = 0.4;
 
@@ -48,7 +48,7 @@ fn hit(self: *Self, dmg: i32) void {
     self.is_invurnable = true;
     self.hit_time_passed = 0;
     self.hit_pos = rutils.new_vector2(self.transform.x + self.transform.width + 10, self.transform.y - 15);
-    self.hit_text_slice = std.fmt.bufPrint(&self.hit_text, "{d}", .{dmg}) catch unreachable;
+    self.hit_text_slice = std.fmt.bufPrintZ(&self.hit_text, "{d}", .{dmg}) catch unreachable;
 
     if (self.health <= 0) {
         self.is_dead = true;
@@ -109,10 +109,11 @@ pub fn draw(self: *const Self, base_color: rl.Color) void {
     if (self.is_dead) {
         color = rl.BLACK;
     } else if (self.is_invurnable) {
-        color = rl.Fade(color, 0.2);
+        color = rl.Fade(color, 0.7);
     }
     rl.DrawRectangleRec(self.transform, color);
 
+    // TODO: text still can be under entity
     if (self.is_invurnable) {
         fonts.draw_text(self.hit_text_slice, self.hit_pos, fonts.FontSize.Bigger, self.hit_color);
     }

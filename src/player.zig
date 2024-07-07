@@ -10,7 +10,8 @@ const debug_info = @import("debug_info.zig");
 const Text = @import("gui/text.zig");
 const Progressbar = @import("gui/progressbar.zig");
 const fonts = @import("gui/fonts.zig");
-const SelfProjectile = @import("player_projectile.zig");
+const PlayerProjectile = @import("player_projectile.zig");
+const PlayerMeteors = @import("player_meteors.zig");
 const Entity = @import("entity.zig");
 const Background = @import("background.zig");
 const screen = @import("screen.zig");
@@ -18,7 +19,8 @@ const screen = @import("screen.zig");
 const Self = @This();
 
 entity: Entity,
-player_projectile: SelfProjectile,
+player_projectile: PlayerProjectile,
+player_meteors: PlayerMeteors,
 exp: f32,
 lvl: u32,
 exp_progressbar: Progressbar,
@@ -40,7 +42,7 @@ fn init_progress_bar() Progressbar {
     return Progressbar{
         .transform = transform,
         .background_color = rl.GRAY,
-        .fill_color = rl.GREEN,
+        .fill_color = rl.BLUE,
     };
 }
 
@@ -48,7 +50,8 @@ pub fn init(pos: rl.Vector2) Self {
     const entity = Entity.init(pos, 50, 100, rl.RED);
     return Self{
         .entity = entity,
-        .player_projectile = SelfProjectile.init(entity.position_center),
+        .player_projectile = PlayerProjectile.init(entity.position_center),
+        .player_meteors = PlayerMeteors.init(),
         .exp = 0,
         .lvl = 1,
         .exp_progressbar = init_progress_bar(),
@@ -78,6 +81,7 @@ pub fn update(self: *Self) void {
 
     self.entity.update(pos_delta);
     self.player_projectile.update(self.entity.position_center);
+    self.player_meteors.update(self.entity.position_center);
 }
 
 pub fn draw(self: *const Self) void {
@@ -85,6 +89,7 @@ pub fn draw(self: *const Self) void {
 
     if (!self.entity.is_dead) {
         self.player_projectile.draw();
+        self.player_meteors.draw();
     }
 }
 
