@@ -48,7 +48,7 @@ pub fn main() !void {
     var background = Background.init();
     defer background.deinit();
 
-    var player = Player.init(rutils.calc_rect_center(Background.transform));
+    var player = Player.init(allocator, rutils.calc_rect_center(Background.transform));
     defer player.deinit();
 
     var player_pos = player.entity.position_center;

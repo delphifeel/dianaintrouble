@@ -70,5 +70,5 @@ pub fn update(self: *Self, player_center: rl.Vector2) void {
 }
 
 pub fn draw(self: *const Self) void {
-    rl.DrawRectangleRec(self.transform, rl.PURPLE);
+    rl.DrawRectangleRec(self.transform, rl.PINK);
 }

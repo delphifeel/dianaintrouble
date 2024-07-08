@@ -64,6 +64,15 @@ pub fn move_rect(old_rect: rl.Rectangle, offset: rl.Vector2) rl.Rectangle {
     return rect;
 }
 
+pub fn grow_rect_from_center(old_rect: rl.Rectangle, delta_x: f32, delta_y: f32) rl.Rectangle {
+    var rect = old_rect;
+    rect.width += delta_x;
+    rect.height += delta_y;
+    rect.x -= delta_x / 2;
+    rect.y -= delta_y / 2;
+    return rect;
+}
+
 pub fn change_rect_pos(rect: *rl.Rectangle, pos: rl.Vector2) void {
     rect.x = pos.x;
     rect.y = pos.y;

@@ -88,11 +88,16 @@ pub fn update(self: *Enemies, player: *Player) void {
                 player.up_exp();
             }
         }
-        if (rl.CheckCollisionRecs(enemy.entity.collider, player.player_meteors.collider)) {
-            const entity = &enemy.entity;
-            entity.try_hit(20);
-            if (entity.is_dead) {
-                player.up_exp();
+
+        for (player.player_meteors.list.items) |*meteor| {
+            if (meteor.collider) |collider| {
+                if (rl.CheckCollisionRecs(enemy.entity.collider, collider)) {
+                    const entity = &enemy.entity;
+                    entity.try_hit(20);
+                    if (entity.is_dead) {
+                        player.up_exp();
+                    }
+                }
             }
         }
 
