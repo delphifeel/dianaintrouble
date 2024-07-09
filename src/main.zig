@@ -2,6 +2,10 @@
 // - Coords system
 // - Diff. resolutions
 
+// Known bugs:
+// - Spawning out of background
+// - Meteor explosion on top (need to be on background)
+
 const std = @import("std");
 const debug = std.debug;
 const fmt = std.fmt;
@@ -77,6 +81,8 @@ pub fn main() !void {
             background.draw();
             enemies.draw();
             player.draw();
+            player.player_projectile.draw();
+            player.player_meteors.draw();
         }
         rl.EndMode2D();
 

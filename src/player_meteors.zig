@@ -14,7 +14,7 @@ time_passed: f32,
 list: std.ArrayList(Meteor),
 
 const MAX_METEORS = 100;
-const SPAWN_EVERY: f32 = 3;
+const SPAWN_EVERY: f32 = 0.5;
 
 pub fn update(self: *Self, player_pos: rl.Vector2) void {
     const frame_time = rl.GetFrameTime();

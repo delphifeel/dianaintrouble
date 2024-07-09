@@ -58,24 +58,23 @@ pub fn update(self: *Enemies, player: *Player) void {
                 const rand_pos = rutils.rand_coord_in_range(player.entity.position_center, MIN_OFFSET, MAX_OFFSET);
                 self.list.items[i] = Enemy.init(rand_pos);
             }
-            continue;
-        }
-
-        if (rl.CheckCollisionRecs(enemy.entity.collider, player.player_projectile.collider)) {
-            const entity = &enemy.entity;
-            entity.try_hit(10);
-            if (entity.is_dead) {
-                player.up_exp();
+        } else {
+            if (rl.CheckCollisionRecs(enemy.entity.collider, player.player_projectile.collider)) {
+                const entity = &enemy.entity;
+                entity.try_hit(10);
+                if (entity.is_dead) {
+                    player.up_exp();
+                }
             }
-        }
 
-        for (player.player_meteors.list.items) |*meteor| {
-            if (meteor.collider) |collider| {
-                if (rl.CheckCollisionRecs(enemy.entity.collider, collider)) {
-                    const entity = &enemy.entity;
-                    entity.try_hit(20);
-                    if (entity.is_dead) {
-                        player.up_exp();
+            for (player.player_meteors.list.items) |*meteor| {
+                if (meteor.collider) |collider| {
+                    if (rl.CheckCollisionRecs(enemy.entity.collider, collider)) {
+                        const entity = &enemy.entity;
+                        entity.try_hit(20);
+                        if (entity.is_dead) {
+                            player.up_exp();
+                        }
                     }
                 }
             }
@@ -86,7 +85,10 @@ pub fn update(self: *Enemies, player: *Player) void {
 }
 
 pub fn draw(self: *const Enemies) void {
-    for (self.list.items) |enemy| {
+    for (self.list.items) |*enemy| {
         enemy.draw();
+    }
+    for (self.list.items) |*enemy| {
+        enemy.entity.draw_hit_text();
     }
 }

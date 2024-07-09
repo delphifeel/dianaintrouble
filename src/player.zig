@@ -89,11 +89,6 @@ pub fn update(self: *Self) void {
 
 pub fn draw(self: *const Self) void {
     self.entity.draw(rl.BLUE);
-
-    if (!self.entity.is_dead) {
-        self.player_projectile.draw();
-        self.player_meteors.draw();
-    }
 }
 
 pub fn draw_exp_progress(self: *const Self) void {

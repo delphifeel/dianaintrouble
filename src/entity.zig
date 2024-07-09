@@ -52,7 +52,6 @@ fn hit(self: *Self, dmg: i32) void {
 
     if (self.health <= 0) {
         self.is_dead = true;
-        self.is_invurnable = false;
     }
 }
 
@@ -90,16 +89,16 @@ pub fn update(self: *Self, move_offset: rl.Vector2) void {
             self.collider = self.transform;
             self.position_center = rutils.calc_rect_center(self.transform);
         } else {}
+    }
 
-        if (self.is_invurnable) {
-            self.hit_time_passed += rl.GetFrameTime();
-            if (self.hit_time_passed < HIT_TIMEOUT) {
-                self.hit_pos.y -= 1;
-                self.hit_pos.x += 0.2;
-            } else {
-                self.is_invurnable = false;
-                self.hit_time_passed = 0;
-            }
+    if (self.is_invurnable) {
+        self.hit_time_passed += rl.GetFrameTime();
+        if (self.hit_time_passed < HIT_TIMEOUT) {
+            self.hit_pos.y -= 1;
+            self.hit_pos.x += 0.2;
+        } else {
+            self.is_invurnable = false;
+            self.hit_time_passed = 0;
         }
     }
 }
@@ -112,8 +111,10 @@ pub fn draw(self: *const Self, base_color: rl.Color) void {
         color = rl.Fade(color, 0.7);
     }
     rl.DrawRectangleRec(self.transform, color);
+}
 
-    // TODO: text still can be under entity
+// TODO: should move it to sep. module
+pub fn draw_hit_text(self: *const Self) void {
     if (self.is_invurnable) {
         fonts.draw_text(self.hit_text_slice, self.hit_pos, fonts.FontSize.Bigger, self.hit_color);
     }
