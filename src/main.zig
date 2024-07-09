@@ -65,7 +65,6 @@ pub fn main() !void {
 
             player.update();
             camera.target = player.entity.position_center;
-
             enemies.update(&player);
         }
 

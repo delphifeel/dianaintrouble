@@ -5,29 +5,54 @@ const screen = @import("screen.zig");
 
 pub const TARGET_FPS = 120;
 
-pub fn rand_float_normalized() f32 {
-    const v: f32 = @floatFromInt(rl.GetRandomValue(-100, 100));
-    return v / 100;
+// NOTE: no seed for now
+var seed_set = true;
+
+fn rand_f(min: f32, max: f32) f32 {
+    const min_i: i32 = @intFromFloat(min);
+    const max_i: i32 = @intFromFloat(max);
+    const v = rl.GetRandomValue(min_i, max_i);
+    const v_f: f32 = @floatFromInt(v);
+    return v_f;
 }
 
 pub fn rand_coord_in_range(init_pos: rl.Vector2, min: f32, max: f32) rl.Vector2 {
-    var rand_f = rand_float_normalized();
-    var v = (max - min) * rand_f;
-    var new_x = init_pos.x;
-    if (v < 0) {
-        new_x -= min + v;
-    } else {
-        new_x += min + v;
+    const side = rl.GetRandomValue(1, 4);
+
+    var v: f32 = 0;
+    // left
+    if (side == 1) {
+        v = rand_f(min, max);
+        const new_x = init_pos.x - v;
+        v = rand_f(-max, max);
+        const new_y = init_pos.y + v;
+        return new_vector2(new_x, new_y);
     }
-    rand_f = rand_float_normalized();
-    v = (max - min) * rand_f;
-    var new_y = init_pos.y;
-    if (v < 0) {
-        new_y -= min + v;
-    } else {
-        new_y += min + v;
+    // right
+    if (side == 2) {
+        v = rand_f(min, max);
+        const new_x = init_pos.x + v;
+        v = rand_f(-max, max);
+        const new_y = init_pos.y + v;
+        return new_vector2(new_x, new_y);
     }
-    return new_vector2(new_x, new_y);
+    // top
+    if (side == 3) {
+        v = rand_f(-max, max);
+        const new_x = init_pos.x + v;
+        v = rand_f(min, max);
+        const new_y = init_pos.y - v;
+        return new_vector2(new_x, new_y);
+    }
+    // bottom
+    if (side == 4) {
+        v = rand_f(-max, max);
+        const new_x = init_pos.x + v;
+        v = rand_f(min, max);
+        const new_y = init_pos.y + v;
+        return new_vector2(new_x, new_y);
+    }
+    unreachable;
 }
 
 pub fn print_rect(rect: rl.Rectangle) void {
@@ -145,3 +170,28 @@ pub fn rect_with_padding(old_rect: rl.Rectangle, x_padding: f32, y_padding: f32)
 // 	rect.Height -= top + bottom
 // 	return rect
 // }
+
+test "rand value" {
+    const max = 500;
+    const min = 300;
+    const init_pos = new_vector2(0, 0);
+    var v_f: f32 = -0.01;
+
+    var v = (max - min) * v_f;
+    var new_x = init_pos.x;
+    if (v < 0) {
+        new_x += -min + v;
+    } else {
+        new_x += min + v;
+    }
+    v_f = 0.5;
+    v = (max - min) * v_f;
+    var new_y = init_pos.y;
+    if (v < 0) {
+        new_y += -min + v;
+    } else {
+        new_y += min + v;
+    }
+
+    std.debug.print("{d}:{d}", .{ new_x, new_y });
+}

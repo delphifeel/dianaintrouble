@@ -39,7 +39,7 @@ pub fn reset(self: *Self) void {
 
 pub fn respawn(self: *Self, player_center: rl.Vector2) void {
     const final_pos = rutils.rand_coord_in_range(player_center, MIN_OFFSET_FROM_CENTER, MAX_OFFSET_FROM_CENTER);
-    const start_pos = rutils.new_vector2(final_pos.x, final_pos.y - Background.transform.height / 7);
+    const start_pos = rutils.new_vector2(final_pos.x, final_pos.y - Background.transform.height / 4);
 
     self.is_falling = true;
     self.done = false;

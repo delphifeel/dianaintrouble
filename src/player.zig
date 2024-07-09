@@ -47,7 +47,7 @@ fn init_progress_bar() Progressbar {
 }
 
 pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
-    const entity = Entity.init(pos, 50, 100, rl.RED);
+    const entity = Entity.init(pos, 60, 100, rl.RED);
     var player_meteors = PlayerMeteors.init(allocator);
     player_meteors.start_spawning();
     return Self{
