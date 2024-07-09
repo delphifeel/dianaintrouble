@@ -52,6 +52,7 @@ fn hit(self: *Self, dmg: i32) void {
 
     if (self.health <= 0) {
         self.is_dead = true;
+        self.is_invurnable = false;
     }
 }
 
@@ -76,30 +77,29 @@ pub fn init(center_pos: rl.Vector2, size: f32, start_health: i32, hit_color: rl.
 pub fn deinit(_: *Self) void {}
 
 pub fn update(self: *Self, move_offset: rl.Vector2) void {
-    if (self.is_dead) {
-        return;
-    }
-    var new_move_offset = move_offset;
-    if ((new_move_offset.x != 0) and (new_move_offset.y != 0)) {
-        new_move_offset.x *= 0.7;
-        new_move_offset.y *= 0.7;
-    }
+    if (!self.is_dead) {
+        var new_move_offset = move_offset;
+        if ((new_move_offset.x != 0) and (new_move_offset.y != 0)) {
+            new_move_offset.x *= 0.7;
+            new_move_offset.y *= 0.7;
+        }
 
-    const new_transform = rutils.move_rect(self.transform, move_offset);
-    if (!rutils.is_rect_out_of_rect(new_transform, Background.transform)) {
-        self.transform = new_transform;
-        self.collider = self.transform;
-        self.position_center = rutils.calc_rect_center(self.transform);
-    } else {}
+        const new_transform = rutils.move_rect(self.transform, move_offset);
+        if (!rutils.is_rect_out_of_rect(new_transform, Background.transform)) {
+            self.transform = new_transform;
+            self.collider = self.transform;
+            self.position_center = rutils.calc_rect_center(self.transform);
+        } else {}
 
-    if (self.is_invurnable) {
-        self.hit_time_passed += rl.GetFrameTime();
-        if (self.hit_time_passed < HIT_TIMEOUT) {
-            self.hit_pos.y -= 1;
-            self.hit_pos.x += 0.2;
-        } else {
-            self.is_invurnable = false;
-            self.hit_time_passed = 0;
+        if (self.is_invurnable) {
+            self.hit_time_passed += rl.GetFrameTime();
+            if (self.hit_time_passed < HIT_TIMEOUT) {
+                self.hit_pos.y -= 1;
+                self.hit_pos.x += 0.2;
+            } else {
+                self.is_invurnable = false;
+                self.hit_time_passed = 0;
+            }
         }
     }
 }

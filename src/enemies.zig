@@ -14,10 +14,13 @@ const Player = @import("player.zig");
 const Enemies = @This();
 
 list: std.ArrayList(Enemy),
+time_passed: f32,
 
-const ENEMIES_COUNT: f32 = 700;
-const MIN_OFFSET: f32 = 500;
-const MAX_OFFSET: f32 = 1100;
+const ENEMIES_COUNT: f32 = 1000;
+const MAX_RESPAWN_ENEMIES = 30;
+const MIN_OFFSET: f32 = 700;
+const MAX_OFFSET: f32 = 900;
+const SPAWN_EVERY: f32 = 3;
 
 pub fn spawn(allocator: std.mem.Allocator, player_center: rl.Vector2) Enemies {
     var enemies = std.ArrayList(Enemy).initCapacity(allocator, ENEMIES_COUNT) catch h.oom();
@@ -31,6 +34,7 @@ pub fn spawn(allocator: std.mem.Allocator, player_center: rl.Vector2) Enemies {
     }
     return Enemies{
         .list = enemies,
+        .time_passed = 0,
     };
 }
 
@@ -39,8 +43,21 @@ pub fn deinit(self: *Enemies) void {
 }
 
 pub fn update(self: *Enemies, player: *Player) void {
-    for (self.list.items) |*enemy| {
+    self.time_passed += rl.GetFrameTime();
+    var need_to_spawn = false;
+    var raspawned: i32 = 0;
+    if (self.time_passed >= SPAWN_EVERY) {
+        self.time_passed = 0;
+        need_to_spawn = true;
+    }
+
+    for (self.list.items, 0..) |*enemy, i| {
         if (enemy.entity.is_dead) {
+            if (need_to_spawn and raspawned < MAX_RESPAWN_ENEMIES) {
+                raspawned += 1;
+                const rand_pos = rutils.rand_coord_in_range(player.entity.position_center, MIN_OFFSET, MAX_OFFSET);
+                self.list.items[i] = Enemy.init(rand_pos);
+            }
             continue;
         }
 
