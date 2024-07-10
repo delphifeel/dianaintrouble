@@ -47,9 +47,8 @@ fn init_progress_bar() Progressbar {
 }
 
 pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
-    const entity = Entity.init(pos, 60, 100, rl.RED);
+    const entity = Entity.init(pos, 60, 10000, rl.RED);
     var player_meteors = PlayerMeteors.init(allocator);
-    player_meteors.start_spawning();
     return Self{
         .entity = entity,
         .player_projectile = PlayerProjectile.init(entity.position_center),
@@ -58,6 +57,11 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
         .lvl = 1,
         .exp_progressbar = init_progress_bar(),
     };
+}
+
+// TODO: move meteors outside of player
+pub fn start(self: *Self) void {
+    self.player_meteors.start();
 }
 
 pub fn deinit(self: *Self) void {

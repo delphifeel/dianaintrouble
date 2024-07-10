@@ -14,7 +14,7 @@ time_passed: f32,
 list: std.ArrayList(Meteor),
 
 const MAX_METEORS = 100;
-const SPAWN_EVERY: f32 = 0.5;
+const SPAWN_EVERY: f32 = 1;
 
 pub fn update(self: *Self, player_pos: rl.Vector2) void {
     const frame_time = rl.GetFrameTime();
@@ -49,16 +49,13 @@ pub fn init(allocator: std.mem.Allocator) Self {
     };
 }
 
-pub fn start_spawning(self: *Self) void {
+pub fn start(self: *Self) void {
     var i: i32 = 0;
     while (i < MAX_METEORS) {
-        var meteor: Meteor = undefined;
-        meteor.reset();
-        self.list.append(meteor) catch h.oom();
+        self.list.append(Meteor.init()) catch h.oom();
         i += 1;
     }
 }
-
 pub fn deinit(self: *Self) void {
     self.list.deinit();
 }

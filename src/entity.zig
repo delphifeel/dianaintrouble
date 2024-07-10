@@ -56,7 +56,9 @@ fn hit(self: *Self, dmg: i32) void {
 }
 
 pub fn init(center_pos: rl.Vector2, size: f32, start_health: i32, hit_color: rl.Color) Self {
-    const transform = rutils.new_rect(center_pos.x - size / 2, center_pos.y - size / 2, size, size);
+    var transform = rutils.new_rect(center_pos.x - size / 2, center_pos.y - size / 2, size, size);
+    transform = rutils.find_nearest_rect_inside_world(transform);
+
     const position_center = rutils.calc_rect_center(transform);
     return Self{
         .transform = transform,

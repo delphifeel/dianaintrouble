@@ -2,18 +2,28 @@ const std = @import("std");
 const rl = @import("raylib.zig");
 const rm = @import("raymath.zig");
 const screen = @import("screen.zig");
+const Background = @import("background.zig");
 
 pub const TARGET_FPS = 120;
 
-// NOTE: no seed for now
-var seed_set = true;
+// if it outside background boundaries - spawn nearest pos inside background
+pub fn find_nearest_rect_inside_world(src_rect: rl.Rectangle) rl.Rectangle {
+    var new_transform = src_rect;
+    const r2 = Background.transform;
+    if (new_transform.x < r2.x) {
+        new_transform.x = r2.x;
+    }
+    if (new_transform.y < r2.y) {
+        new_transform.y = r2.y;
+    }
+    if (new_transform.x + new_transform.width > r2.x + r2.width) {
+        new_transform.x = r2.x + r2.width - new_transform.width;
+    }
+    if (new_transform.y + new_transform.height > r2.y + r2.height) {
+        new_transform.y = r2.y + r2.height - new_transform.height;
+    }
 
-fn rand_f(min: f32, max: f32) f32 {
-    const min_i: i32 = @intFromFloat(min);
-    const max_i: i32 = @intFromFloat(max);
-    const v = rl.GetRandomValue(min_i, max_i);
-    const v_f: f32 = @floatFromInt(v);
-    return v_f;
+    return new_transform;
 }
 
 pub fn rand_coord_in_range(init_pos: rl.Vector2, min: f32, max: f32) rl.Vector2 {
@@ -64,7 +74,6 @@ pub inline fn distance_by_speed(speed: f32, last_frame_time: f32) f32 {
     return speed * last_frame_time;
 }
 
-// TODO: we compare as ints but this can cause problems
 pub fn is_rect_out_of_rect(r1: rl.Rectangle, r2: rl.Rectangle) bool {
     if (r1.x < r2.x) {
         return true;
@@ -194,4 +203,15 @@ test "rand value" {
     }
 
     std.debug.print("{d}:{d}", .{ new_x, new_y });
+}
+
+// NOTE: no seed for now
+var seed_set = true;
+
+fn rand_f(min: f32, max: f32) f32 {
+    const min_i: i32 = @intFromFloat(min);
+    const max_i: i32 = @intFromFloat(max);
+    const v = rl.GetRandomValue(min_i, max_i);
+    const v_f: f32 = @floatFromInt(v);
+    return v_f;
 }

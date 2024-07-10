@@ -13,8 +13,9 @@ const Self = @This();
 entity: Entity,
 
 pub fn init(pos: rl.Vector2) Self {
+    var entity = Entity.init(pos, 50, 20, rl.GREEN);
     return Self{
-        .entity = Entity.init(pos, 50, 20, rl.GREEN),
+        .entity = entity,
     };
 }
 

@@ -26,24 +26,32 @@ const MIN_OFFSET_FROM_CENTER: i32 = 300;
 const MAX_OFFSET_FROM_CENTER: i32 = 700;
 const EXPLOSION_TIME: f32 = 1;
 
-pub fn reset(self: *Self) void {
-    self.is_explosion = false;
-    self.is_falling = false;
-    self.done = true;
-    self.transform = undefined;
-    self.collider = null;
-    self.final_pos = undefined;
-    self.time_passed = 0;
-    self.rotation = 0;
+pub fn init() Self {
+    return Self{
+        .is_explosion = false,
+        .is_falling = false,
+        .done = true,
+        .transform = undefined,
+        .collider = null,
+        .final_pos = undefined,
+        .time_passed = 0,
+        .rotation = 0,
+    };
 }
 
 pub fn respawn(self: *Self, player_center: rl.Vector2) void {
-    const final_pos = rutils.rand_coord_in_range(player_center, MIN_OFFSET_FROM_CENTER, MAX_OFFSET_FROM_CENTER);
+    var final_pos = rutils.rand_coord_in_range(player_center, MIN_OFFSET_FROM_CENTER, MAX_OFFSET_FROM_CENTER);
+    var final_approx_transform = rutils.new_rect_with_pos(final_pos, SIZE, SIZE);
+    if (rutils.is_rect_out_of_rect(final_approx_transform, Background.transform)) {
+        final_approx_transform = rutils.find_nearest_rect_inside_world(final_approx_transform);
+        final_pos = rutils.rect_pos(final_approx_transform);
+    }
     const start_pos = rutils.new_vector2(final_pos.x, final_pos.y - Background.transform.height / 4);
+    const transform = rutils.new_rect_with_pos(start_pos, SIZE, SIZE);
 
     self.is_falling = true;
     self.done = false;
-    self.transform = rutils.new_rect_with_pos(start_pos, SIZE, SIZE);
+    self.transform = transform;
     self.final_pos = final_pos;
 }
 

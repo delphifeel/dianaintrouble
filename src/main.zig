@@ -54,6 +54,7 @@ pub fn main() !void {
 
     var player = Player.init(allocator, rutils.calc_rect_center(Background.transform));
     defer player.deinit();
+    player.start();
 
     var player_pos = player.entity.position_center;
     var enemies = Enemies.spawn(allocator, player_pos);
@@ -83,6 +84,8 @@ pub fn main() !void {
             player.draw();
             player.player_projectile.draw();
             player.player_meteors.draw();
+            // TODO: hit text as sep. module
+            player.entity.draw_hit_text();
         }
         rl.EndMode2D();
 
