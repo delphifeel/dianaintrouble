@@ -94,10 +94,11 @@ pub fn update(self: *Self, move_offset: rl.Vector2) void {
     }
 
     if (self.is_invurnable) {
-        self.hit_time_passed += rl.GetFrameTime();
+        const frame_time = rl.GetFrameTime();
+        self.hit_time_passed += frame_time;
         if (self.hit_time_passed < HIT_TIMEOUT) {
-            self.hit_pos.y -= 1;
-            self.hit_pos.x += 0.2;
+            self.hit_pos.y -= rutils.distance_by_speed(200, frame_time);
+            // self.hit_pos.x -= rutils.distance_by_speed(120, frame_time);
         } else {
             self.is_invurnable = false;
             self.hit_time_passed = 0;
@@ -118,6 +119,6 @@ pub fn draw(self: *const Self, base_color: rl.Color) void {
 // TODO: should move it to sep. module
 pub fn draw_hit_text(self: *const Self) void {
     if (self.is_invurnable) {
-        fonts.draw_text(self.hit_text_slice, self.hit_pos, fonts.FontSize.Bigger, self.hit_color);
+        fonts.draw_text(self.hit_text_slice, self.hit_pos, .Bigger, self.hit_color);
     }
 }

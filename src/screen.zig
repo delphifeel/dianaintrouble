@@ -1,10 +1,16 @@
 const rl = @import("raylib.zig");
 const Background = @import("background.zig");
+const rutils = @import("rutils.zig");
 
-// const width: f32 = 1600;
-// const height: f32 = 900;
+// pub const width: f32 = 1920;
+// pub const height: f32 = 1080;
+
+// pub const width: f32 = 1600;
+// pub const height: f32 = 900;
 pub const width: f32 = 1200;
 pub const height: f32 = 675;
+// pub const width: f32 = 600;
+// pub const height: f32 = 340;
 
 pub const camera_zoom: f32 = width / (Background.transform.width / 2);
 
@@ -12,6 +18,7 @@ pub const Center = rl.Vector2{ .x = width / 2, .y = height / 2 };
 
 pub fn init() void {
     rl.InitWindow(width, height, "Project D");
+    rl.SetTargetFPS(rutils.TARGET_FPS);
 }
 
 pub fn deinit() void {

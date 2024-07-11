@@ -37,7 +37,6 @@ pub fn main() !void {
     rl.SetTraceLogLevel(rl.LOG_WARNING);
     screen.init();
     defer screen.deinit();
-    rl.SetTargetFPS(rutils.TARGET_FPS);
 
     fonts.load_fonts(allocator);
     defer fonts.unload_fonts();
@@ -116,7 +115,7 @@ fn camera_follow_player(camera: *rl.Camera2D, player: *const Player, camera_set:
 
 fn calc_camera_rect_in_world(camera: rl.Camera2D) rl.Rectangle {
     const left_top = rl.GetScreenToWorld2D(rutils.new_vector2(0, 0), camera);
-    const right_bottom = rl.GetScreenToWorld2D(rutils.new_vector2(screen.width - 1, screen.height - 1), camera);
+    const right_bottom = rl.GetScreenToWorld2D(rutils.new_vector2(screen.width, screen.height), camera);
     return rutils.new_rect_from_vec2(left_top, right_bottom);
 }
 

@@ -233,10 +233,7 @@ test "rand value" {
     std.debug.print("{d}:{d}", .{ new_x, new_y });
 }
 
-// NOTE: no seed for now
-var seed_set = true;
-
-fn rand_f(min: f32, max: f32) f32 {
+inline fn rand_f(min: f32, max: f32) f32 {
     const min_i: i32 = @intFromFloat(min);
     const max_i: i32 = @intFromFloat(max);
     const v = rl.GetRandomValue(min_i, max_i);
