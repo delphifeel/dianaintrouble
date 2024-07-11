@@ -12,6 +12,7 @@ const Progressbar = @import("gui/progressbar.zig");
 const fonts = @import("gui/fonts.zig");
 const PlayerProjectile = @import("player_projectile.zig");
 const PlayerMeteors = @import("player_meteors.zig");
+const PlayerSparkles = @import("player_sparkles.zig");
 const Entity = @import("entity.zig");
 const Background = @import("background.zig");
 const screen = @import("screen.zig");
@@ -21,6 +22,7 @@ const Self = @This();
 entity: Entity,
 player_projectile: PlayerProjectile,
 player_meteors: PlayerMeteors,
+sparkles: PlayerSparkles,
 exp: f32,
 lvl: u32,
 exp_progressbar: Progressbar,
@@ -52,6 +54,7 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
     return Self{
         .entity = entity,
         .player_projectile = PlayerProjectile.init(entity.position_center),
+        .sparkles = PlayerSparkles.init(entity.position_center),
         .player_meteors = player_meteors,
         .exp = 0,
         .lvl = 1,
@@ -67,6 +70,7 @@ pub fn start(self: *Self) void {
 pub fn deinit(self: *Self) void {
     self.entity.deinit();
     self.player_meteors.deinit();
+    self.sparkles.deinit();
 }
 
 pub fn update(self: *Self) void {
@@ -88,6 +92,7 @@ pub fn update(self: *Self) void {
 
     self.entity.update(pos_delta);
     self.player_projectile.update(self.entity.position_center);
+    self.sparkles.update(self.entity.position_center);
     self.player_meteors.update(self.entity.position_center);
 }
 
