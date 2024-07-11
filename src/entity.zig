@@ -28,6 +28,7 @@ hit_time_passed: f32,
 hit_pos: rl.Vector2,
 hit_text: [4]u8,
 hit_text_slice: [:0]u8,
+hit_text_x_offset: f32 = 0,
 
 const HIT_TIMEOUT: f32 = 0.4;
 
@@ -44,6 +45,9 @@ pub fn try_hit(self: *Self, dmg: i32) void {
 }
 
 fn hit(self: *Self, dmg: i32) void {
+    const distance_per_frame = rutils.distance_per_frame(100, rl.GetFrameTime());
+    self.hit_text_x_offset = rutils.rand_f(-distance_per_frame, distance_per_frame);
+
     self.health -= dmg;
     self.is_invurnable = true;
     self.hit_time_passed = 0;
@@ -97,8 +101,8 @@ pub fn update(self: *Self, move_offset: rl.Vector2) void {
         const frame_time = rl.GetFrameTime();
         self.hit_time_passed += frame_time;
         if (self.hit_time_passed < HIT_TIMEOUT) {
-            self.hit_pos.y -= rutils.distance_by_speed(200, frame_time);
-            // self.hit_pos.x -= rutils.distance_by_speed(120, frame_time);
+            self.hit_pos.y -= rutils.distance_per_frame(200, frame_time);
+            self.hit_pos.x += self.hit_text_x_offset;
         } else {
             self.is_invurnable = false;
             self.hit_time_passed = 0;

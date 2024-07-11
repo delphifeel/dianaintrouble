@@ -25,7 +25,7 @@ pub fn deinit(self: *Self) void {
 
 pub fn update(self: *Self, player_entity: *Entity) void {
     const delta = rl.GetFrameTime();
-    const step = rutils.distance_by_speed(50, delta);
+    const step = rutils.distance_per_frame(50, delta);
     const self_center = self.entity.position_center;
     const diff = rm.Vector2Subtract(player_entity.position_center, self_center);
     const step_vec = rm.Vector2Normalize(diff);

@@ -73,8 +73,7 @@ pub fn print_vec2(vec: rl.Vector2) void {
     std.debug.print("x: {d}, y: {d}\n", .{ vec.x, vec.y });
 }
 
-pub inline fn distance_by_speed(speed: f32, last_frame_time: f32) f32 {
-    // d = v * t
+pub inline fn distance_per_frame(speed: f32, last_frame_time: f32) f32 {
     return speed * last_frame_time;
 }
 
@@ -199,6 +198,14 @@ pub fn rect_with_padding(old_rect: rl.Rectangle, x_padding: f32, y_padding: f32)
     return rect;
 }
 
+pub inline fn rand_f(min: f32, max: f32) f32 {
+    const min_i: i32 = @intFromFloat(min);
+    const max_i: i32 = @intFromFloat(max);
+    const v = rl.GetRandomValue(min_i, max_i);
+    const v_f: f32 = @floatFromInt(v);
+    return v_f;
+}
+
 // pub fn RectWithPaddingEx(rect rl.Rectangle, top float32, right float32, bottom float32, left float32) rl.Rectangle {
 // 	rect.X += left
 // 	rect.Width -= right + left
@@ -231,12 +238,4 @@ test "rand value" {
     }
 
     std.debug.print("{d}:{d}", .{ new_x, new_y });
-}
-
-inline fn rand_f(min: f32, max: f32) f32 {
-    const min_i: i32 = @intFromFloat(min);
-    const max_i: i32 = @intFromFloat(max);
-    const v = rl.GetRandomValue(min_i, max_i);
-    const v_f: f32 = @floatFromInt(v);
-    return v_f;
 }

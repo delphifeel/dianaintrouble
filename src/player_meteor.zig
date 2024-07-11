@@ -58,12 +58,12 @@ pub fn respawn(self: *Self, player_center: rl.Vector2) void {
 pub fn deinit(_: *Self) void {}
 
 fn animate_falling(self: *Self, last_frame_time: f32) void {
-    self.rotation += rutils.distance_by_speed(300, last_frame_time);
-    self.transform.y += rutils.distance_by_speed(600, last_frame_time);
+    self.rotation += rutils.distance_per_frame(300, last_frame_time);
+    self.transform.y += rutils.distance_per_frame(600, last_frame_time);
 }
 
 fn animate_explosion(self: *Self, last_frame_time: f32) void {
-    const delta = rutils.distance_by_speed(100, last_frame_time);
+    const delta = rutils.distance_per_frame(100, last_frame_time);
     self.transform = rutils.grow_rect_from_center(self.transform, delta, delta);
     self.collider = self.transform;
 }

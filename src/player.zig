@@ -71,7 +71,7 @@ pub fn deinit(self: *Self) void {
 
 pub fn update(self: *Self) void {
     const delta = rl.GetFrameTime();
-    const step = rutils.distance_by_speed(80, delta);
+    const step = rutils.distance_per_frame(80, delta);
     var pos_delta = rm.Vector2Zero();
     if (rl.IsKeyDown(rl.KEY_A)) {
         pos_delta.x -= step;
