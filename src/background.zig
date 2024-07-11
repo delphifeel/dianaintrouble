@@ -9,7 +9,8 @@ const rutils = @import("rutils.zig");
 
 const Background = @This();
 
-pub const transform = rutils.new_rect(0, 0, 2000, 2000);
+pub const transform = rutils.new_rect(0, 0, 4000, 4000);
+// pub const transform = rutils.new_rect(0, 0, 2000, 2000);
 
 texture: rl.Texture2D,
 

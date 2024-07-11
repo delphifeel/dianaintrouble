@@ -48,6 +48,7 @@ pub fn main() !void {
         .rotation = 0.0,
         .zoom = screen.camera_zoom,
     };
+    var camera_set = false;
 
     var background = Background.init();
     defer background.deinit();
@@ -69,7 +70,7 @@ pub fn main() !void {
             }
 
             player.update();
-            camera.target = player.entity.position_center;
+            camera_follow_player(&camera, &player, &camera_set);
             enemies.update(&player);
         }
 
@@ -95,6 +96,56 @@ pub fn main() !void {
 
         rl.EndDrawing();
     }
+}
+
+fn camera_follow_player(camera: *rl.Camera2D, player: *const Player, camera_set: *bool) void {
+    const camera_set_v = camera_set.*;
+    var new_camera_target = player.entity.position_center;
+
+    if (!camera_set_v) {
+        camera.target = new_camera_target;
+        camera_set.* = true;
+        return;
+    }
+
+    camera.target = new_camera_target;
+    const camera_rect = calc_camera_rect_in_world(camera.*);
+    const out_of_rect_vec = rutils.calc_rect_out_of_rect(camera_rect, Background.transform);
+    camera.target = rm.Vector2Subtract(camera.target, out_of_rect_vec);
+}
+
+fn calc_camera_rect_in_world(camera: rl.Camera2D) rl.Rectangle {
+    const left_top = rl.GetScreenToWorld2D(rutils.new_vector2(0, 0), camera);
+    const right_bottom = rl.GetScreenToWorld2D(rutils.new_vector2(screen.width - 1, screen.height - 1), camera);
+    return rutils.new_rect_from_vec2(left_top, right_bottom);
+}
+
+fn matrix_cast(m: rl.Matrix) rm.Matrix {
+    return .{
+        .m0 = m.m0,
+        .m1 = m.m1,
+        .m2 = m.m2,
+        .m3 = m.m3,
+        .m4 = m.m4,
+        .m5 = m.m5,
+        .m6 = m.m6,
+        .m7 = m.m7,
+        .m8 = m.m8,
+        .m9 = m.m9,
+        .m10 = m.m10,
+        .m11 = m.m11,
+        .m12 = m.m12,
+        .m13 = m.m13,
+        .m14 = m.m14,
+        .m15 = m.m15,
+    };
+}
+
+fn print_matrix(m: rl.Matrix) void {
+    debug.print("\n{d}\t{d}\t{d}\t{d}\n", .{ m.m0, m.m4, m.m8, m.m12 });
+    debug.print("{d}\t{d}\t{d}\t{d}\n", .{ m.m1, m.m5, m.m9, m.m13 });
+    debug.print("{d}\t{d}\t{d}\t{d}\n", .{ m.m2, m.m6, m.m10, m.m14 });
+    debug.print("{d}\t{d}\t{d}\t{d}\n", .{ m.m3, m.m7, m.m11, m.m15 });
 }
 
 test {

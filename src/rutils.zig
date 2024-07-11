@@ -66,7 +66,11 @@ pub fn rand_coord_in_range(init_pos: rl.Vector2, min: f32, max: f32) rl.Vector2 
 }
 
 pub fn print_rect(rect: rl.Rectangle) void {
-    std.debug.print("{d} : {d} : {d} : {d}\n", .{ rect.x, rect.y, rect.width, rect.height });
+    std.debug.print("x: {d}, y: {d}, w: {d}, h:{d}\n", .{ rect.x, rect.y, rect.width, rect.height });
+}
+
+pub fn print_vec2(vec: rl.Vector2) void {
+    std.debug.print("x: {d}, y: {d}\n", .{ vec.x, vec.y });
 }
 
 pub inline fn distance_by_speed(speed: f32, last_frame_time: f32) f32 {
@@ -89,6 +93,25 @@ pub fn is_rect_out_of_rect(r1: rl.Rectangle, r2: rl.Rectangle) bool {
     }
 
     return false;
+}
+
+pub fn calc_rect_out_of_rect(r1: rl.Rectangle, r2: rl.Rectangle) rl.Vector2 {
+    var x: f32 = 0;
+    var y: f32 = 0;
+
+    if (r1.x < r2.x) {
+        x = r1.x - r2.x;
+    } else if (r1.x + r1.width > r2.x + r2.width) {
+        x = r1.x + r1.width - (r2.x + r2.width);
+    }
+
+    if (r1.y < r2.y) {
+        y = r1.y - r2.y;
+    } else if (r1.y + r1.height > r2.y + r2.height) {
+        y = r1.y + r1.height - (r2.y + r2.height);
+    }
+
+    return new_vector2(x, y);
 }
 
 pub fn move_rect(old_rect: rl.Rectangle, offset: rl.Vector2) rl.Rectangle {
@@ -114,6 +137,11 @@ pub fn change_rect_pos(rect: *rl.Rectangle, pos: rl.Vector2) void {
 
 pub fn new_vector2(x: f32, y: f32) rl.Vector2 {
     return rl.Vector2{ .x = x, .y = y };
+}
+
+// TODO: is it bounding box actually ?
+pub fn new_rect_from_vec2(left_top: rl.Vector2, right_bottom: rl.Vector2) rl.Rectangle {
+    return new_rect(left_top.x, left_top.y, right_bottom.x - left_top.x, right_bottom.y - left_top.y);
 }
 
 pub fn new_rect(x: f32, y: f32, width: f32, height: f32) rl.Rectangle {
