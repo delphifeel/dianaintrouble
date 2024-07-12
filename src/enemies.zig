@@ -16,16 +16,17 @@ const Enemies = @This();
 list: std.ArrayList(Enemy),
 time_passed: f32,
 
-const ENEMIES_COUNT: f32 = 1000;
-const MAX_RESPAWN_ENEMIES = 30;
+const START_ENEMIES_COUNT: f32 = 1000;
+var maxEnemiesPerRespawn: i32 = 30;
+const RESPAWN_COUNT_INC = 1000;
 const MIN_OFFSET: f32 = 700;
 const MAX_OFFSET: f32 = 900;
 const SPAWN_EVERY: f32 = 3;
 
 pub fn spawn(allocator: std.mem.Allocator, player_center: rl.Vector2) Enemies {
-    var enemies = std.ArrayList(Enemy).initCapacity(allocator, ENEMIES_COUNT) catch h.oom();
+    var enemies = std.ArrayList(Enemy).initCapacity(allocator, START_ENEMIES_COUNT * 10) catch h.oom();
     var i: i32 = 0;
-    while (i < ENEMIES_COUNT) {
+    while (i < START_ENEMIES_COUNT) {
         const rand_pos = rutils.rand_coord_in_range(player_center, MIN_OFFSET, MAX_OFFSET);
         var enemy = Enemy.init(rand_pos);
         enemies.append(enemy) catch h.oom();
@@ -45,16 +46,17 @@ pub fn deinit(self: *Enemies) void {
 pub fn update(self: *Enemies, player: *Player) void {
     self.time_passed += rl.GetFrameTime();
     var need_to_spawn = false;
-    var raspawned: i32 = 0;
+    var respawnedCount: i32 = 0;
     if (self.time_passed >= SPAWN_EVERY) {
         self.time_passed = 0;
         need_to_spawn = true;
+        maxEnemiesPerRespawn += RESPAWN_COUNT_INC;
     }
 
     for (self.list.items, 0..) |*enemy, i| {
         if (enemy.entity.is_dead) {
-            if (need_to_spawn and raspawned < MAX_RESPAWN_ENEMIES) {
-                raspawned += 1;
+            if (need_to_spawn and respawnedCount < maxEnemiesPerRespawn) {
+                respawnedCount += 1;
                 const rand_pos = rutils.rand_coord_in_range(player.entity.position_center, MIN_OFFSET, MAX_OFFSET);
                 self.list.items[i] = Enemy.init(rand_pos);
             }
@@ -76,7 +78,7 @@ pub fn update(self: *Enemies, player: *Player) void {
             }
 
             for (player.meteors.list.items) |*meteor| {
-                if (meteor.collider) |collider| {
+                if (meteor.explosion_collider) |collider| {
                     if (rl.CheckCollisionRecs(enemy.entity.collider, collider)) {
                         const entity = &enemy.entity;
                         entity.try_hit(player.meteors.dmg);
@@ -89,6 +91,15 @@ pub fn update(self: *Enemies, player: *Player) void {
         }
 
         enemy.update(&player.entity);
+    }
+
+    if (need_to_spawn and respawnedCount < maxEnemiesPerRespawn) {
+        while (respawnedCount < maxEnemiesPerRespawn) {
+            respawnedCount += 1;
+            const rand_pos = rutils.rand_coord_in_range(player.entity.position_center, MIN_OFFSET, MAX_OFFSET);
+            var enemy = Enemy.init(rand_pos);
+            self.list.append(enemy) catch h.oom();
+        }
     }
 }
 

@@ -19,7 +19,7 @@ explosion_color_alpha: f32,
 done: bool,
 final_pos: rl.Vector2,
 transform: rl.Rectangle,
-collider: ?rl.Rectangle,
+explosion_collider: ?rl.Rectangle,
 time_passed: f32,
 rotation: f32,
 
@@ -36,7 +36,7 @@ pub fn init() Self {
         .is_falling = false,
         .done = true,
         .transform = undefined,
-        .collider = null,
+        .explosion_collider = null,
         .final_pos = undefined,
         .time_passed = 0,
         .rotation = 0,
@@ -69,13 +69,13 @@ fn animate_falling(self: *Self, last_frame_time: f32) void {
 
 fn animate_explosion(self: *Self, last_frame_time: f32) void {
     if (self.is_exploded) {
-        self.collider = null;
+        self.explosion_collider = null;
         self.explosion_color_alpha -= rutils.distance_per_frame(1, last_frame_time);
         const delta = rutils.distance_per_frame(100, last_frame_time);
         self.transform = rutils.grow_rect_from_center(self.transform, -delta, -delta);
     } else {
         self.transform = rutils.grow_rect_from_center(self.transform, self.transform.width * 3, self.transform.height * 3);
-        self.collider = self.transform;
+        self.explosion_collider = self.transform;
         self.is_exploded = true;
     }
 }
@@ -100,7 +100,7 @@ pub fn update(self: *Self) void {
             self.is_explosion = false;
             self.is_exploded = false;
             self.done = true;
-            self.collider = null;
+            self.explosion_collider = null;
         }
         return;
     }
