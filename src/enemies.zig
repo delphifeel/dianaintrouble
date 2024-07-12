@@ -59,9 +59,9 @@ pub fn update(self: *Enemies, player: *Player) void {
                 self.list.items[i] = Enemy.init(rand_pos);
             }
         } else {
-            if (rl.CheckCollisionRecs(enemy.entity.collider, player.player_projectile.collider)) {
+            if (rl.CheckCollisionRecs(enemy.entity.collider, player.heart_projectile.collider)) {
                 const entity = &enemy.entity;
-                entity.try_hit(10);
+                entity.try_hit(player.heart_projectile.dmg);
                 if (entity.is_dead) {
                     player.up_exp();
                 }
@@ -69,17 +69,17 @@ pub fn update(self: *Enemies, player: *Player) void {
 
             if (player.sparkles.is_collides(enemy.entity.collider)) {
                 const entity = &enemy.entity;
-                entity.try_hit(15);
+                entity.try_hit(player.sparkles.dmg);
                 if (entity.is_dead) {
                     player.up_exp();
                 }
             }
 
-            for (player.player_meteors.list.items) |*meteor| {
+            for (player.meteors.list.items) |*meteor| {
                 if (meteor.collider) |collider| {
                     if (rl.CheckCollisionRecs(enemy.entity.collider, collider)) {
                         const entity = &enemy.entity;
-                        entity.try_hit(20);
+                        entity.try_hit(player.meteors.dmg);
                         if (entity.is_dead) {
                             player.up_exp();
                         }

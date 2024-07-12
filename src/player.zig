@@ -10,9 +10,9 @@ const debug_info = @import("debug_info.zig");
 const Text = @import("gui/text.zig");
 const Progressbar = @import("gui/progressbar.zig");
 const fonts = @import("gui/fonts.zig");
-const PlayerProjectile = @import("player_projectile.zig");
-const PlayerMeteors = @import("player_meteors.zig");
-const PlayerSparkles = @import("player_sparkles.zig");
+const HeartProjectile = @import("player_heart_projectile.zig");
+const Meteors = @import("player_meteors.zig");
+const Sparkles = @import("player_sparkles.zig");
 const Entity = @import("entity.zig");
 const Background = @import("background.zig");
 const screen = @import("screen.zig");
@@ -20,9 +20,9 @@ const screen = @import("screen.zig");
 const Self = @This();
 
 entity: Entity,
-player_projectile: PlayerProjectile,
-player_meteors: PlayerMeteors,
-sparkles: PlayerSparkles,
+heart_projectile: HeartProjectile,
+meteors: Meteors,
+sparkles: Sparkles,
 exp: f32,
 lvl: u32,
 exp_progressbar: Progressbar,
@@ -50,12 +50,12 @@ fn init_progress_bar() Progressbar {
 
 pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
     const entity = Entity.init(pos, 60, 10000, rl.RED);
-    var player_meteors = PlayerMeteors.init(allocator);
+    var meteors = Meteors.init(allocator);
     return Self{
         .entity = entity,
-        .player_projectile = PlayerProjectile.init(entity.position_center),
-        .sparkles = PlayerSparkles.init(entity.position_center),
-        .player_meteors = player_meteors,
+        .heart_projectile = HeartProjectile.init(entity.position_center),
+        .sparkles = Sparkles.init(entity.position_center),
+        .meteors = meteors,
         .exp = 0,
         .lvl = 1,
         .exp_progressbar = init_progress_bar(),
@@ -64,12 +64,12 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
 
 // TODO: move meteors outside of player
 pub fn start(self: *Self) void {
-    self.player_meteors.start();
+    self.meteors.start();
 }
 
 pub fn deinit(self: *Self) void {
     self.entity.deinit();
-    self.player_meteors.deinit();
+    self.meteors.deinit();
     self.sparkles.deinit();
 }
 
@@ -91,9 +91,9 @@ pub fn update(self: *Self) void {
     }
 
     self.entity.update(pos_delta);
-    self.player_projectile.update(self.entity.position_center);
+    self.heart_projectile.update(self.entity.position_center);
     self.sparkles.update(self.entity.position_center);
-    self.player_meteors.update(self.entity.position_center);
+    self.meteors.update(self.entity.position_center);
 }
 
 pub fn draw(self: *const Self) void {

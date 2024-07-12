@@ -82,9 +82,9 @@ pub fn main() !void {
             background.draw();
             enemies.draw();
             player.draw();
-            player.player_projectile.draw();
+            player.heart_projectile.draw();
             player.sparkles.draw();
-            player.player_meteors.draw();
+            player.meteors.draw();
             // TODO: hit text as sep. module
             player.entity.draw_hit_text();
         }

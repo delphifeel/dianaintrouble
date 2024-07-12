@@ -12,6 +12,7 @@ const Self = @This();
 
 time_passed: f32,
 list: std.ArrayList(Meteor),
+dmg: i32 = 20,
 
 const MAX_METEORS = 100;
 const SPAWN_EVERY: f32 = 1;

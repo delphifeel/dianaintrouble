@@ -14,6 +14,7 @@ const Self = @This();
 transforms: [4]rl.Rectangle = undefined,
 colliders: [4]rl.Rectangle = undefined,
 time_passed: f32 = 0,
+dmg: i32 = 5,
 
 const FIRE_TIMEOUT: comptime_float = 2;
 const SIZE: f32 = 50;
@@ -32,7 +33,7 @@ fn reset(self: *Self, player_center: rl.Vector2) void {
 }
 
 pub fn init(player_center: rl.Vector2) Self {
-    var self: Self = undefined;
+    var self: Self = .{};
     self.reset(player_center);
 
     return self;

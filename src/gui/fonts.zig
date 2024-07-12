@@ -15,7 +15,7 @@ pub const FontSize = enum(i32) {
     Small = @intFromFloat(screen.remy(2.7)),
     Medium = @intFromFloat(screen.remy(4)),
     Big = @intFromFloat(screen.remy(5.26)),
-    Bigger = @intFromFloat(screen.remy(7)),
+    Bigger = @intFromFloat(screen.remy(9)),
 };
 
 var fonts: std.AutoHashMap(FontSize, rl.Font) = undefined;

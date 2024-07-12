@@ -9,7 +9,6 @@ const rutils = @import("rutils.zig");
 const debug_info = @import("debug_info.zig");
 const Text = @import("gui/text.zig");
 const fonts = @import("gui/fonts.zig");
-const SelfProjectile = @import("player_projectile.zig");
 const Background = @import("background.zig");
 
 const Self = @This();
@@ -26,7 +25,7 @@ is_invurnable: bool,
 hit_color: rl.Color,
 hit_time_passed: f32,
 hit_pos: rl.Vector2,
-hit_text: [4]u8,
+hit_text: [8]u8,
 hit_text_slice: [:0]u8,
 hit_text_x_offset: f32 = 0,
 
@@ -52,7 +51,10 @@ fn hit(self: *Self, dmg: i32) void {
     self.is_invurnable = true;
     self.hit_time_passed = 0;
     self.hit_pos = rutils.new_vector2(self.transform.x + self.transform.width + 10, self.transform.y - 15);
-    self.hit_text_slice = std.fmt.bufPrintZ(&self.hit_text, "{d}", .{dmg}) catch unreachable;
+    self.hit_text_slice = std.fmt.bufPrintZ(&self.hit_text, "{d}", .{dmg}) catch {
+        std.debug.print("{d}\n", .{dmg});
+        unreachable;
+    };
 
     if (self.health <= 0) {
         self.is_dead = true;

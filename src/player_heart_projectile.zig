@@ -14,6 +14,7 @@ const Self = @This();
 transform: rl.Rectangle,
 collider: rl.Rectangle,
 time_passed: f32,
+dmg: i32 = 10,
 
 const SIZE: f32 = 30;
 const OFFSET_FROM_CENTER: f32 = 150;
