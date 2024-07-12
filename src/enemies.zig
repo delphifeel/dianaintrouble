@@ -16,9 +16,13 @@ const Enemies = @This();
 list: std.ArrayList(Enemy),
 time_passed: f32,
 
-const START_ENEMIES_COUNT: f32 = 1000;
+// TODO: seg. fault on this values
+// const START_ENEMIES_COUNT: f32 = 1000;
+// var maxEnemiesPerRespawn: i32 = 30;
+// const RESPAWN_COUNT_INC = 1000;
+const START_ENEMIES_COUNT: f32 = 100;
 var maxEnemiesPerRespawn: i32 = 30;
-const RESPAWN_COUNT_INC = 1000;
+const RESPAWN_COUNT_INC = 5;
 const MIN_OFFSET: f32 = 700;
 const MAX_OFFSET: f32 = 900;
 const SPAWN_EVERY: f32 = 3;

@@ -52,7 +52,6 @@ fn hit(self: *Self, dmg: i32) void {
     self.hit_time_passed = 0;
     self.hit_pos = rutils.new_vector2(self.transform.x + self.transform.width + 10, self.transform.y - 15);
     self.hit_text_slice = std.fmt.bufPrintZ(&self.hit_text, "{d}", .{dmg}) catch {
-        std.debug.print("{d}\n", .{dmg});
         unreachable;
     };
 
