@@ -93,8 +93,16 @@ pub fn update(self: *Enemies, player: *Player) void {
 }
 
 pub fn draw(self: *const Enemies) void {
+    // TODO: this should be separated array for cache
     for (self.list.items) |*enemy| {
-        enemy.draw();
+        if (enemy.entity.is_dead) {
+            enemy.draw();
+        }
+    }
+    for (self.list.items) |*enemy| {
+        if (!enemy.entity.is_dead) {
+            enemy.draw();
+        }
     }
     for (self.list.items) |*enemy| {
         enemy.entity.draw_hit_text();

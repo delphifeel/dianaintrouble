@@ -18,13 +18,13 @@ dmg: i32 = 5,
 
 const FIRE_TIMEOUT: comptime_float = 2;
 const SIZE: f32 = 50;
-const OFFSET_FROM_CENTER: f32 = 50;
+const OFFSET_FROM_CENTER: f32 = 100;
 
 fn reset(self: *Self, player_center: rl.Vector2) void {
-    self.transforms[0] = rutils.new_rect(player_center.x - OFFSET_FROM_CENTER, player_center.y - OFFSET_FROM_CENTER, SIZE, SIZE);
-    self.transforms[1] = rutils.new_rect(player_center.x + OFFSET_FROM_CENTER, player_center.y - OFFSET_FROM_CENTER, SIZE, SIZE);
-    self.transforms[2] = rutils.new_rect(player_center.x + OFFSET_FROM_CENTER, player_center.y + OFFSET_FROM_CENTER, SIZE, SIZE);
-    self.transforms[3] = rutils.new_rect(player_center.x - OFFSET_FROM_CENTER, player_center.y + OFFSET_FROM_CENTER, SIZE, SIZE);
+    self.transforms[0] = rutils.new_rect_with_center_pos_xy(player_center.x - OFFSET_FROM_CENTER, player_center.y - OFFSET_FROM_CENTER, SIZE, SIZE);
+    self.transforms[1] = rutils.new_rect_with_center_pos_xy(player_center.x + OFFSET_FROM_CENTER, player_center.y - OFFSET_FROM_CENTER, SIZE, SIZE);
+    self.transforms[2] = rutils.new_rect_with_center_pos_xy(player_center.x + OFFSET_FROM_CENTER, player_center.y + OFFSET_FROM_CENTER, SIZE, SIZE);
+    self.transforms[3] = rutils.new_rect_with_center_pos_xy(player_center.x - OFFSET_FROM_CENTER, player_center.y + OFFSET_FROM_CENTER, SIZE, SIZE);
 
     self.colliders[0] = self.transforms[0];
     self.colliders[1] = self.transforms[1];

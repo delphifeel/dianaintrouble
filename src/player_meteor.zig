@@ -14,6 +14,8 @@ const Self = @This();
 
 is_falling: bool,
 is_explosion: bool,
+is_exploded: bool,
+explosion_color_alpha: f32,
 done: bool,
 final_pos: rl.Vector2,
 transform: rl.Rectangle,
@@ -29,6 +31,8 @@ const EXPLOSION_TIME: f32 = 1;
 pub fn init() Self {
     return Self{
         .is_explosion = false,
+        .is_exploded = false,
+        .explosion_color_alpha = 1,
         .is_falling = false,
         .done = true,
         .transform = undefined,
@@ -49,6 +53,7 @@ pub fn respawn(self: *Self, player_center: rl.Vector2) void {
     const start_pos = rutils.new_vector2(final_pos.x, final_pos.y - Background.transform.height / 4);
     const transform = rutils.new_rect_with_pos(start_pos, SIZE, SIZE);
 
+    self.explosion_color_alpha = 1;
     self.is_falling = true;
     self.done = false;
     self.transform = transform;
@@ -63,9 +68,16 @@ fn animate_falling(self: *Self, last_frame_time: f32) void {
 }
 
 fn animate_explosion(self: *Self, last_frame_time: f32) void {
-    const delta = rutils.distance_per_frame(100, last_frame_time);
-    self.transform = rutils.grow_rect_from_center(self.transform, delta, delta);
-    self.collider = self.transform;
+    if (self.is_exploded) {
+        self.collider = null;
+        self.explosion_color_alpha -= rutils.distance_per_frame(1, last_frame_time);
+        const delta = rutils.distance_per_frame(100, last_frame_time);
+        self.transform = rutils.grow_rect_from_center(self.transform, -delta, -delta);
+    } else {
+        self.transform = rutils.grow_rect_from_center(self.transform, self.transform.width * 3, self.transform.height * 3);
+        self.collider = self.transform;
+        self.is_exploded = true;
+    }
 }
 
 pub fn update(self: *Self) void {
@@ -86,6 +98,7 @@ pub fn update(self: *Self) void {
         if (self.time_passed >= EXPLOSION_TIME) {
             self.time_passed = 0;
             self.is_explosion = false;
+            self.is_exploded = false;
             self.done = true;
             self.collider = null;
         }
@@ -94,5 +107,5 @@ pub fn update(self: *Self) void {
 }
 
 pub fn draw(self: *const Self) void {
-    rl.DrawRectanglePro(self.transform, rutils.new_vector2(SIZE / 2, SIZE / 2), self.rotation, rl.RED);
+    rl.DrawRectanglePro(self.transform, rutils.new_vector2(SIZE / 2, SIZE / 2), self.rotation, rl.ColorAlpha(rl.RED, self.explosion_color_alpha));
 }

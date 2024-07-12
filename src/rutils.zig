@@ -171,6 +171,13 @@ pub inline fn new_rect_with_pos(pos: rl.Vector2, width: f32, height: f32) rl.Rec
     return new_rect(pos.x, pos.y, width, height);
 }
 
+pub inline fn new_rect_with_center_pos(center_pos: rl.Vector2, width: f32, height: f32) rl.Rectangle {
+    return new_rect(center_pos.x - width / 2, center_pos.y - height / 2, width, height);
+}
+pub inline fn new_rect_with_center_pos_xy(center_pos_x: f32, center_pos_y: f32, width: f32, height: f32) rl.Rectangle {
+    return new_rect(center_pos_x - width / 2, center_pos_y - height / 2, width, height);
+}
+
 pub inline fn rect_pos(rect: rl.Rectangle) rl.Vector2 {
     return new_vector2(rect.x, rect.y);
 }
