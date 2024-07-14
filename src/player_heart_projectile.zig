@@ -13,61 +13,31 @@ const Self = @This();
 
 transform: rl.Rectangle,
 collider: rl.Rectangle,
-time_passed: f32,
+angle: f32,
 dmg: i32 = 10,
 
-const SIZE: f32 = 30;
+const SIZE: f32 = 40;
 const OFFSET_FROM_CENTER: f32 = 150;
-const SWITCH_CORNER_TIMEOUT: f32 = 0.05;
-
-fn set_new_pos(self: *Self, player_center: rl.Vector2, frame_time: f32) void {
-    self.time_passed += frame_time;
-    if (self.time_passed >= SWITCH_CORNER_TIMEOUT * 4) {
-        self.time_passed = 0;
-    }
-
-    const pos_i: i32 = @intFromFloat(self.time_passed / SWITCH_CORNER_TIMEOUT);
-
-    // TODO: we really need coors system, also refactor this
-    switch (pos_i) {
-        0 => {
-            self.transform.x = player_center.x + OFFSET_FROM_CENTER - SIZE / 2;
-            self.transform.y = player_center.y - OFFSET_FROM_CENTER - SIZE / 2;
-        },
-        1 => {
-            self.transform.x = player_center.x + OFFSET_FROM_CENTER - SIZE / 2;
-            self.transform.y = player_center.y + OFFSET_FROM_CENTER - SIZE / 2;
-        },
-        2 => {
-            self.transform.x = player_center.x - OFFSET_FROM_CENTER - SIZE / 2;
-            self.transform.y = player_center.y + OFFSET_FROM_CENTER - SIZE / 2;
-        },
-        3 => {
-            self.transform.x = player_center.x - OFFSET_FROM_CENTER - SIZE / 2;
-            self.transform.y = player_center.y - OFFSET_FROM_CENTER - SIZE / 2;
-        },
-        else => unreachable,
-    }
-
-    self.collider = self.transform;
-}
-
-fn calc_start_pos(player_center: rl.Vector2) rl.Rectangle {
-    return rutils.new_rect(player_center.x, player_center.y, SIZE, SIZE);
-}
+const INIT_ANGLE: comptime_float = 270;
 
 pub fn init(player_center: rl.Vector2) Self {
-    const transform = calc_start_pos(player_center);
+    const pos = rutils.rotate_vector2(player_center, OFFSET_FROM_CENTER, INIT_ANGLE);
+    const transform = rutils.new_rect_with_center_pos(pos, SIZE, SIZE);
     return Self{
         .transform = transform,
         .collider = transform,
-        .time_passed = 0,
+        .angle = INIT_ANGLE,
     };
 }
 
 pub fn update(self: *Self, player_center: rl.Vector2) void {
-    // appear in one of 4 corners once of time
-    self.set_new_pos(player_center, rl.GetFrameTime());
+    self.angle += rutils.distance_per_frame(300, rl.GetFrameTime());
+    if (self.angle >= 360) {
+        self.angle = 360 - self.angle;
+    }
+    const new_pos = rutils.rotate_vector2(player_center, OFFSET_FROM_CENTER, self.angle);
+    self.transform = rutils.new_rect_with_center_pos(new_pos, SIZE, SIZE);
+    self.collider = self.transform;
 }
 
 pub fn draw(self: *const Self) void {

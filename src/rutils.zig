@@ -6,6 +6,13 @@ const Background = @import("background.zig");
 
 pub const TARGET_FPS = 120;
 
+pub fn rotate_vector2(center: rl.Vector2, radius: f32, angle_deg: f32) rl.Vector2 {
+    const angle_rad = std.math.degreesToRadians(f32, angle_deg);
+    const x = center.x + radius * std.math.cos(angle_rad);
+    const y = center.y + radius * std.math.sin(angle_rad);
+    return new_vector2(x, y);
+}
+
 // if it outside background boundaries - spawn nearest pos inside background
 pub fn find_nearest_rect_inside_world(src_rect: rl.Rectangle) rl.Rectangle {
     var new_transform = src_rect;
