@@ -47,18 +47,21 @@ pub fn main() !void {
         .rotation = 0.0,
         .zoom = screen.camera_zoom,
     };
-    var camera_set = false;
-
-    var background = Background.init();
-    defer background.deinit();
 
     var player = Player.init(allocator, rutils.calc_rect_center(Background.transform));
     defer player.deinit();
     player.start();
 
+    camera_init(&camera, &player);
+
+    var background = Background.init();
+    defer background.deinit();
+
     var player_pos = player.entity.position_center;
     var enemies = Enemies.spawn(allocator, player_pos);
     defer enemies.deinit();
+
+    var game_paused = false;
 
     while (!rl.WindowShouldClose()) {
 
@@ -67,10 +70,15 @@ pub fn main() !void {
             if (rl.IsMouseButtonPressed(rl.MOUSE_RIGHT_BUTTON)) {
                 camera.zoom = 0.1;
             }
+            if (rl.IsKeyPressed(rl.KEY_SPACE)) {
+                game_paused = !game_paused;
+            }
 
-            player.update();
-            camera_follow_player(&camera, &player, &camera_set);
-            enemies.update(&player);
+            if (!game_paused) {
+                player.update();
+                camera_follow_player(&camera, &player);
+                enemies.update(&player);
+            }
         }
 
         // ------------------------------- DRAW -------------------------------
@@ -98,17 +106,15 @@ pub fn main() !void {
     }
 }
 
-fn camera_follow_player(camera: *rl.Camera2D, player: *const Player, camera_set: *bool) void {
-    const camera_set_v = camera_set.*;
-    var new_camera_target = player.entity.position_center;
+fn camera_init(
+    camera: *rl.Camera2D,
+    player: *const Player,
+) void {
+    camera.target = player.entity.position_center;
+}
 
-    if (!camera_set_v) {
-        camera.target = new_camera_target;
-        camera_set.* = true;
-        return;
-    }
-
-    camera.target = new_camera_target;
+fn camera_follow_player(camera: *rl.Camera2D, player: *const Player) void {
+    camera.target = player.entity.position_center;
     const camera_rect = calc_camera_rect_in_world(camera.*);
     const out_of_rect_vec = rutils.calc_rect_out_of_rect(camera_rect, Background.transform);
     camera.target = rm.Vector2Subtract(camera.target, out_of_rect_vec);
