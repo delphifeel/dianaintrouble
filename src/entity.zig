@@ -18,15 +18,14 @@ transform: rl.Rectangle,
 position_center: rl.Vector2,
 collider: rl.Rectangle,
 health: i32,
-is_dead: bool,
-// was hit, and now invurnable
-is_invurnable: bool,
 
+is_dead: bool = false,
+is_invurnable: bool = false,
 hit_color: rl.Color,
-hit_time_passed: f32,
-hit_pos: rl.Vector2,
-hit_text: [8]u8,
-hit_text_slice: [:0]u8,
+hit_time_passed: f32 = 0,
+hit_pos: rl.Vector2 = undefined,
+hit_text: [8]u8 = undefined,
+hit_text_slice: [:0]u8 = undefined,
 hit_text_x_offset: f32 = 0,
 
 const HIT_TIMEOUT: f32 = 0.4;
@@ -70,13 +69,7 @@ pub fn init(center_pos: rl.Vector2, size: f32, start_health: i32, hit_color: rl.
         .position_center = position_center,
         .collider = transform,
         .health = start_health,
-        .is_dead = false,
-        .is_invurnable = false,
-        .hit_time_passed = 0,
         .hit_color = hit_color,
-        .hit_pos = undefined,
-        .hit_text = undefined,
-        .hit_text_slice = undefined,
     };
 }
 

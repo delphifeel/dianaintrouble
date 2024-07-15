@@ -7,27 +7,21 @@ const helpers = @import("helpers.zig");
 const rutils = @import("rutils.zig");
 // ---+---+---+---+---+---
 
-const Background = @This();
+const Self = @This();
 
 pub const transform = rutils.new_rect(0, 0, 4000, 4000);
 // pub const transform = rutils.new_rect(0, 0, 2000, 2000);
 
-texture: rl.Texture2D,
-
-pub fn init() Background {
-    var background = Background{
-        .texture = rl.LoadTexture("assets/background.png"),
-    };
-    return background;
+pub fn init() Self {
+    return Self{};
 }
 
-pub fn deinit(self: *Background) void {
-    rl.UnloadTexture(self.texture);
-}
+pub fn deinit(_: *Self) void {}
 
-pub fn update(_: *Background) void {}
+pub fn update(_: *Self) void {}
 
-pub fn draw(self: *const Background) void {
-    var source = rutils.new_rect(0, 0, @floatFromInt(self.texture.width), @floatFromInt(self.texture.height));
-    rl.DrawTexturePro(self.texture, source, transform, rm.Vector2Zero(), 0, rl.WHITE);
+pub fn draw(_: *const Self) void {
+    // var source = rutils.new_rect(0, 0, @floatFromInt(self.texture.width), @floatFromInt(self.texture.height));
+    // rl.DrawTexturePro(self.texture, source, transform, rm.Vector2Zero(), 0, rl.WHITE);
+    rl.DrawRectangleRec(transform, rl.DARKBROWN);
 }
