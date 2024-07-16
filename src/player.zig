@@ -28,14 +28,14 @@ exp: f32,
 lvl: u32,
 exp_progressbar: Progressbar,
 
-const MAX_EXP: f32 = 100;
+const MAX_EXP: f32 = 2;
 
 pub fn up_exp(self: *Self) void {
     self.exp += 11;
     if (self.exp > MAX_EXP) {
         self.exp = 0;
         self.lvl += 1;
-        player_lvlup_ui.show();
+        player_lvlup_ui.show(self.lvl);
     }
 }
 

@@ -16,14 +16,15 @@ const MAX_UPGRADES = 3;
 
 var rand_algo: std.rand.Random = undefined;
 var skills_pool: []skills.SkillId = undefined;
-var skills_pool_start_index: usize = 0;
+var skills_pool_left: []skills.SkillId = undefined;
 var upgrades_pool: []skills.SkillUpgradeId = undefined;
-var upgrades_pool_start_index: usize = 0;
 var allocator: std.mem.Allocator = undefined;
 var game_paused: *bool = undefined;
 
+var hovered_card_index: i32 = -1;
 var transforms: [MAX_UPGRADES]rl.Rectangle = undefined;
 var names: [MAX_UPGRADES]Text = undefined;
+var descriptions: [MAX_UPGRADES]Text = undefined;
 
 pub fn init(_allocator: std.mem.Allocator, _game_paused: *bool) void {
     allocator = _allocator;
@@ -32,10 +33,11 @@ pub fn init(_allocator: std.mem.Allocator, _game_paused: *bool) void {
     game_paused = _game_paused;
 
     const skills_ids = std.enums.values(skills.SkillId);
-    skills_pool = allocator.dupe(skills.SkillId, skills_ids);
+    skills_pool = allocator.dupe(skills.SkillId, skills_ids) catch h.oom();
+    skills_pool_left = skills_pool;
 
     const upgrades_ids = std.enums.values(skills.SkillUpgradeId);
-    upgrades_pool = allocator.dupe(skills.SkillUpgradeId, upgrades_ids);
+    upgrades_pool = allocator.dupe(skills.SkillUpgradeId, upgrades_ids) catch h.oom();
 }
 
 pub fn deinit() void {
@@ -46,8 +48,11 @@ pub fn deinit() void {
 const CARD_HEIGHT = screen.remy(50);
 const CARD_WIDTH = screen.remx(20);
 const CARD_GAP = screen.remx(8);
+const CARD_NAME_Y_PADDING = screen.remy(2);
 
-pub fn show(lvl: i32) void {
+const PANEL_RECT = rutils.new_rect_in_center(rutils.calc_panel_size(MAX_UPGRADES, CARD_WIDTH, CARD_GAP), CARD_HEIGHT);
+
+pub fn show(lvl: u32) void {
     game_paused.* = true;
 
     if (lvl == 2) {
@@ -56,45 +61,69 @@ pub fn show(lvl: i32) void {
         prepare_upgrades();
     }
 
-    const panel_size = rutils.calc_panel_size(MAX_UPGRADES, CARD_WIDTH, CARD_GAP);
-    const panel_rect = rutils.new_rect_in_center(panel_size, CARD_HEIGHT);
-    for (0..MAX_UPGRADES) |i| {
-        const pos_x = rutils.calc_child_pos(i, panel_rect.x, CARD_WIDTH, CARD_GAP);
-
-        transforms[i] = rutils.new_rect(pos_x, panel_rect.y, CARD_WIDTH, CARD_HEIGHT);
-        names[i] = Text.init_aligned("Hello", .Bigger, transforms[i], .AllCenter);
-    }
-
     visible = true;
 }
 
+// TODO: remove heart cause its default for player
 fn prepare_skills() void {
-    // TODO: remove heart cause its default for player
-
-    if (skills_pool_start_index == skills_pool.len) {
+    if (skills_pool_left.len == 0) {
         return;
     }
 
-    rand_algo.shuffle(skills.SkillId, skills_pool);
-    for (skills_pool_start_index..(skills_pool_start_index + MAX_UPGRADES)) |i| {
-        if (i == skills_pool.len) {
+    rand_algo.shuffle(skills.SkillId, skills_pool_left);
+    for (0..MAX_UPGRADES) |i| {
+        const skill_id = skills_pool_left[0];
+        const skill = skills.find_skill_by_id(skill_id);
+
+        const pos_x = rutils.calc_child_pos(i, PANEL_RECT.x, CARD_WIDTH, CARD_GAP);
+        transforms[i] = rutils.new_rect(pos_x, PANEL_RECT.y, CARD_WIDTH, CARD_HEIGHT);
+
+        const name_bounds = rutils.rect_with_padding(transforms[i], 0, CARD_NAME_Y_PADDING);
+        names[i] = Text.init_aligned(skill.name, .Big, name_bounds, .Top);
+
+        const description_bounds = transforms[i];
+        descriptions[i] = Text.init_aligned(skill.description, .Medium, description_bounds, .AllCenter);
+
+        skills_pool_left = skills_pool_left[1..];
+        if (skills_pool_left.len == 0) {
             break;
         }
-
-        const skill_id = skills_pool[skills_pool_start_index];
-        skills_pool_start_index += 1;
     }
 }
 
-fn prepare_skills() void {}
+fn prepare_upgrades() void {}
+
+pub fn update() void {
+    if (!visible) {
+        return;
+    }
+
+    hovered_card_index = -1;
+    for (transforms, 0..) |transform, i| {
+        if (rl.CheckCollisionPointRec(rl.GetMousePosition(), transform)) {
+            hovered_card_index = @intCast(i);
+
+            if (rl.IsMouseButtonPressed(rl.MOUSE_BUTTON_LEFT)) {
+                visible = false;
+                game_paused.* = false;
+            }
+
+            break;
+        }
+    }
+}
 
 pub fn draw() void {
     if (visible) {
-        for (transforms) |transform| {
-            rl.DrawRectangleRec(transform, rl.BROWN);
+        for (transforms, 0..) |transform, i| {
+            const color = if (hovered_card_index == i) rl.DARKGREEN else rl.BROWN;
+            rl.DrawRectangleRec(transform, color);
         }
         for (names) |name_text| {
             name_text.draw();
+        }
+        for (descriptions) |desc_text| {
+            desc_text.draw();
         }
     }
 }

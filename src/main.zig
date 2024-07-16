@@ -97,6 +97,7 @@ pub fn main() !void {
             player.meteors.draw();
             // TODO: hit text as sep. module
             player.entity.draw_hit_text();
+            player_lvlup_ui.update();
         }
         rl.EndMode2D();
 
