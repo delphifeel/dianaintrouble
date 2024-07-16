@@ -16,6 +16,7 @@ const Sparkles = @import("player_sparkles.zig");
 const Entity = @import("entity.zig");
 const Background = @import("background.zig");
 const screen = @import("screen.zig");
+const player_lvlup_ui = @import("player_lvlup_ui.zig");
 
 const Self = @This();
 
@@ -34,6 +35,7 @@ pub fn up_exp(self: *Self) void {
     if (self.exp > MAX_EXP) {
         self.exp = 0;
         self.lvl += 1;
+        player_lvlup_ui.show();
     }
 }
 

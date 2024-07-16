@@ -11,22 +11,24 @@ const debug = std.debug;
 const fmt = std.fmt;
 const rl = @import("raylib.zig");
 const rm = @import("raymath.zig");
-const screen = @import("screen.zig");
-const debug_info = @import("debug_info.zig");
+
+const helpers = @import("helpers.zig");
+const string = helpers.string;
+const string_view = helpers.string_view;
+const oom = helpers.oom;
 
 const fonts = @import("gui/fonts.zig");
 const Background = @import("background.zig");
 const Player = @import("player.zig");
 const Enemies = @import("enemies.zig");
 
-// ---+---+--- helpers imports ---+---+---
-const helpers = @import("helpers.zig");
-const string = helpers.string;
-const string_view = helpers.string_view;
-const oom = helpers.oom;
-
+const screen = @import("screen.zig");
+const debug_info = @import("debug_info.zig");
 const rutils = @import("rutils.zig");
-const new_vector2 = rutils.new_vector2;
+const player_lvlup_ui = @import("player_lvlup_ui.zig");
+
+// ---+---+--- helpers imports ---+---+---
+
 // ---+---+---+---+---+---
 
 pub fn main() !void {
@@ -63,15 +65,15 @@ pub fn main() !void {
 
     var game_paused = false;
 
+    player_lvlup_ui.init(allocator, &game_paused);
+    defer player_lvlup_ui.deinit();
+
     while (!rl.WindowShouldClose()) {
 
         // ------------------------------ UPDATE -------------------------------
         {
             if (rl.IsMouseButtonPressed(rl.MOUSE_RIGHT_BUTTON)) {
                 camera.zoom = 0.1;
-            }
-            if (rl.IsKeyPressed(rl.KEY_SPACE)) {
-                game_paused = !game_paused;
             }
 
             if (!game_paused) {
@@ -101,6 +103,9 @@ pub fn main() !void {
         player.draw_exp_progress();
         screen.draw_fps();
         debug_info.draw(&camera);
+        if (player_lvlup_ui.visible) {
+            player_lvlup_ui.draw();
+        }
 
         rl.EndDrawing();
     }

@@ -189,14 +189,14 @@ pub inline fn rect_pos(rect: rl.Rectangle) rl.Vector2 {
     return new_vector2(rect.x, rect.y);
 }
 
-// pub fn CalcItemsSize(itemsCount int, itemSize float32, itemSpaceBetween float32) float32 {
-// 	countFloat := float32(itemsCount)
-// 	return countFloat*itemSize + (countFloat-1)*itemSpaceBetween
-// }
+pub fn calc_panel_size(children_count: f32, child_size: f32, gap: f32) f32 {
+    return children_count * child_size + (children_count - 1) * gap;
+}
 
-// pub fn CalcItemPos(index int, startPos float32, itemSize float32, itemSpaceBetween float32) float32 {
-// 	return startPos + float32(index)*(itemSpaceBetween+itemSize)
-// }
+pub fn calc_child_pos(index: usize, start_pos: f32, child_size: f32, gap: f32) f32 {
+    const index_f: f32 = @floatFromInt(index);
+    return start_pos + index_f * (gap + child_size);
+}
 
 pub fn calc_rect_center(rect: rl.Rectangle) rl.Vector2 {
     return new_vector2(rect.x + rect.width / 2, rect.y + rect.height / 2);

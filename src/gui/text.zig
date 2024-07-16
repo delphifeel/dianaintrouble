@@ -46,7 +46,7 @@ pub fn drawEx(self: *const Text, color: rl.Color) void {
 pub fn init_aligned(text: string_view, font_size: FontSize, bounds: rl.Rectangle, alignment: TextAlignment) Text {
     var font = fonts.get_font(font_size);
     var text_size = rl.MeasureTextEx(font, text.ptr, @floatFromInt(@intFromEnum(font_size)), spacing);
-    var text_pos = rutils.calc_rect_at_center(bounds);
+    var text_pos = rutils.calc_rect_center(bounds);
     text_pos.x -= text_size.x / 2;
     text_pos.y -= text_size.y / 2;
 
