@@ -1,12 +1,10 @@
 const std = @import("std");
-const rl = @import("raylib.zig");
-const rm = @import("raymath.zig");
+const rl = @import("../raylib.zig");
+const rm = @import("../raymath.zig");
+const h = @import("../helpers.zig");
+const rutils = @import("../rutils.zig");
 
-// ---+---+--- helpers imports ---+---+---
-const h = @import("helpers.zig");
-const rutils = @import("rutils.zig");
-// ---+---+---+---+---+---
-const Meteor = @import("player_meteor.zig");
+const Meteor = @import("meteors_internal.zig");
 
 const Self = @This();
 
@@ -44,19 +42,18 @@ pub fn draw(self: *const Self) void {
 }
 
 pub fn init(allocator: std.mem.Allocator) Self {
+    var list = std.ArrayList(Meteor).initCapacity(allocator, MAX_METEORS) catch h.oom();
+
+    for (0..MAX_METEORS) |_| {
+        list.append(Meteor{}) catch h.oom();
+    }
+
     return Self{
         .time_passed = 0,
-        .list = std.ArrayList(Meteor).initCapacity(allocator, MAX_METEORS) catch h.oom(),
+        .list = list,
     };
 }
 
-pub fn start(self: *Self) void {
-    var i: i32 = 0;
-    while (i < MAX_METEORS) {
-        self.list.append(Meteor.init()) catch h.oom();
-        i += 1;
-    }
-}
 pub fn deinit(self: *Self) void {
     self.list.deinit();
 }

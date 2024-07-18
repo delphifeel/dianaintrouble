@@ -65,33 +65,7 @@ pub fn update(self: *Enemies, player: *Player) void {
                 self.list.items[i] = Enemy.init(rand_pos);
             }
         } else {
-            if (rl.CheckCollisionRecs(enemy.entity.collider, player.heart_projectile.collider)) {
-                const entity = &enemy.entity;
-                entity.try_hit(player.heart_projectile.dmg);
-                if (entity.is_dead) {
-                    player.up_exp();
-                }
-            }
-
-            if (player.sparkles.is_collides(enemy.entity.collider)) {
-                const entity = &enemy.entity;
-                entity.try_hit(player.sparkles.dmg);
-                if (entity.is_dead) {
-                    player.up_exp();
-                }
-            }
-
-            for (player.meteors.list.items) |*meteor| {
-                if (meteor.explosion_collider) |collider| {
-                    if (rl.CheckCollisionRecs(enemy.entity.collider, collider)) {
-                        const entity = &enemy.entity;
-                        entity.try_hit(player.meteors.dmg);
-                        if (entity.is_dead) {
-                            player.up_exp();
-                        }
-                    }
-                }
-            }
+            player.hit_enemy_with_skills(&enemy.entity);
         }
 
         enemy.update(&player.entity);

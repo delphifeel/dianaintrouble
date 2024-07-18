@@ -1,13 +1,9 @@
 const std = @import("std");
-const rl = @import("raylib.zig");
-const rm = @import("raymath.zig");
+const rl = @import("../raylib.zig");
+const rm = @import("../raymath.zig");
+const rutils = @import("../rutils.zig");
 
-// ---+---+--- helpers imports ---+---+---
-const helpers = @import("helpers.zig");
-const rutils = @import("rutils.zig");
-// ---+---+---+---+---+---
-
-const Player = @import("player.zig");
+const Player = @import("../player.zig");
 
 const Self = @This();
 

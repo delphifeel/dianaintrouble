@@ -52,7 +52,6 @@ pub fn main() !void {
 
     var player = Player.init(allocator, rutils.calc_rect_center(Background.transform));
     defer player.deinit();
-    player.start();
 
     camera_init(&camera, &player);
 
@@ -81,6 +80,7 @@ pub fn main() !void {
                 camera_follow_player(&camera, &player);
                 enemies.update(&player);
             }
+            player_lvlup_ui.update(&player);
         }
 
         // ------------------------------- DRAW -------------------------------
@@ -92,21 +92,20 @@ pub fn main() !void {
             background.draw();
             enemies.draw();
             player.draw();
-            player.heart_projectile.draw();
-            player.sparkles.draw();
-            player.meteors.draw();
+            player.draw_skills();
             // TODO: hit text as sep. module
             player.entity.draw_hit_text();
-            player_lvlup_ui.update();
         }
         rl.EndMode2D();
 
         player.draw_exp_progress();
-        screen.draw_fps();
-        debug_info.draw(&camera);
         if (player_lvlup_ui.visible) {
             player_lvlup_ui.draw();
         }
+
+        // debug info
+        screen.draw_fps();
+        debug_info.draw(&camera);
 
         rl.EndDrawing();
     }

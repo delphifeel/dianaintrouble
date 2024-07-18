@@ -1,47 +1,30 @@
 const std = @import("std");
-const rl = @import("raylib.zig");
-const rm = @import("raymath.zig");
+const rl = @import("../raylib.zig");
+const rm = @import("../raymath.zig");
+const rutils = @import("../rutils.zig");
 
-// ---+---+--- helpers imports ---+---+---
-const helpers = @import("helpers.zig");
-const rutils = @import("rutils.zig");
-// ---+---+---+---+---+---
-
-const Player = @import("player.zig");
-const Background = @import("background.zig");
+const Player = @import("../player.zig");
+const Background = @import("../background.zig");
 
 const Self = @This();
 
-is_falling: bool,
-is_explosion: bool,
-is_exploded: bool,
-explosion_color_alpha: f32,
-done: bool,
-final_pos: rl.Vector2,
-transform: rl.Rectangle,
-explosion_collider: ?rl.Rectangle,
-time_passed: f32,
-rotation: f32,
+is_falling: bool = false,
+is_explosion: bool = false,
+is_exploded: bool = false,
+explosion_color_alpha: f32 = 1,
+done: bool = true,
+final_pos: rl.Vector2 = undefined,
+transform: rl.Rectangle = undefined,
+explosion_collider: ?rl.Rectangle = null,
+time_passed: f32 = 0,
+rotation: f32 = 0,
 
 const SIZE: f32 = 40;
 const MIN_OFFSET_FROM_CENTER: i32 = 300;
 const MAX_OFFSET_FROM_CENTER: i32 = 700;
 const EXPLOSION_TIME: f32 = 1;
 
-pub fn init() Self {
-    return Self{
-        .is_explosion = false,
-        .is_exploded = false,
-        .explosion_color_alpha = 1,
-        .is_falling = false,
-        .done = true,
-        .transform = undefined,
-        .explosion_collider = null,
-        .final_pos = undefined,
-        .time_passed = 0,
-        .rotation = 0,
-    };
-}
+pub fn deinit(_: *Self) void {}
 
 pub fn respawn(self: *Self, player_center: rl.Vector2) void {
     var final_pos = rutils.rand_coord_in_range(player_center, MIN_OFFSET_FROM_CENTER, MAX_OFFSET_FROM_CENTER);
@@ -59,8 +42,6 @@ pub fn respawn(self: *Self, player_center: rl.Vector2) void {
     self.transform = transform;
     self.final_pos = final_pos;
 }
-
-pub fn deinit(_: *Self) void {}
 
 fn animate_falling(self: *Self, last_frame_time: f32) void {
     self.rotation += rutils.distance_per_frame(300, last_frame_time);

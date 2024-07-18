@@ -22,6 +22,10 @@ pub fn find_skill_by_id(skill_id: SkillId) Skill {
     return all.get(@tagName(skill_id)).?;
 }
 
+pub fn find_upgrade_by_id(id: UpgradeId) SkillUpgrade {
+    return upgrades.get(@tagName(id)).?;
+}
+
 const all = std.ComptimeStringMap(Skill, .{
     .{ @tagName(.Heart), .{
         .id = .Heart,
@@ -41,30 +45,43 @@ const all = std.ComptimeStringMap(Skill, .{
 });
 
 pub const SkillUpgrade = struct {
-    upgrade_info: Skill,
+    info: struct {
+        id: UpgradeId,
+        name: h.string_view,
+        description: h.string_view,
+    },
     related_skill: SkillId,
 };
 
-pub const SkillUpgradeId = enum {
+pub const UpgradeId = enum {
     FasterHeart,
     FasterMeteors,
     FasterSparkles,
 };
 
-pub const upgrades = std.ComptimeStringMap(SkillUpgrade, .{
+const upgrades = std.ComptimeStringMap(SkillUpgrade, .{
     .{ @tagName(.FasterHeart), .{
-        .id = .FasterHeart,
-        .name = "Faster Heart",
-        .description = "Heart moving faster",
+        .info = .{
+            .id = .FasterHeart,
+            .name = "Faster Heart",
+            .description = "Heart moving faster",
+        },
+        .related_skill = .Heart,
     } },
     .{ @tagName(.FasterMeteors), .{
-        .id = .FasterMeteors,
-        .name = "Faster Meteors",
-        .description = "Meteors falling faster",
+        .info = .{
+            .id = .FasterMeteors,
+            .name = "Faster Meteors",
+            .description = "Meteors falling faster",
+        },
+        .related_skill = .Meteors,
     } },
     .{ @tagName(.FasterSparkles), .{
-        .id = .FasterSparkles,
-        .name = "Faster Sparkles",
-        .description = "Faster spawn of sparkles",
+        .info = .{
+            .id = .FasterSparkles,
+            .name = "Faster Sparkles",
+            .description = "Faster spawn of sparkles",
+        },
+        .related_skill = .Sparkles,
     } },
 });
