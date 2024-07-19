@@ -11,7 +11,7 @@ const Player = @import("player.zig");
 
 pub var visible = false;
 
-const MAX_VISIBLE_UPGRADES = 3;
+const MAX_VISIBLE_CARDS = 3;
 
 var rand_algo: std.rand.Random = undefined;
 var skills_pool: std.ArrayList(skillsInfo.SkillId) = undefined;
@@ -20,21 +20,24 @@ var allocator: std.mem.Allocator = undefined;
 var game_paused: *bool = undefined;
 
 var hovered_card_index: i32 = -1;
-var is_showing_skills = false;
-var visible_skills: [MAX_VISIBLE_UPGRADES]skillsInfo.SkillId = undefined;
-var visible_upgrades: [MAX_VISIBLE_UPGRADES]skillsInfo.UpgradeId = undefined;
-
-var visible_cards_count: u32 = 0;
-var transforms: [MAX_VISIBLE_UPGRADES]rl.Rectangle = undefined;
-var names: [MAX_VISIBLE_UPGRADES]Text = undefined;
-var descriptions: [MAX_VISIBLE_UPGRADES]Text = undefined;
+const Card = struct {
+    id: union(enum) {
+        skill: skillsInfo.SkillId,
+        upgrade: skillsInfo.UpgradeId,
+    },
+    transform: rl.Rectangle,
+    name: Text,
+    description: Text,
+};
+var cards: [MAX_VISIBLE_CARDS]Card = undefined;
+var cards_count: usize = 0;
 
 const CARD_HEIGHT = screen.remy(50);
 const CARD_WIDTH = screen.remx(20);
 const CARD_GAP = screen.remx(8);
 const CARD_NAME_Y_PADDING = screen.remy(2);
 const PANEL_RECT = rutils.new_rect_in_center(rutils.calc_panel_size(
-    MAX_VISIBLE_UPGRADES,
+    MAX_VISIBLE_CARDS,
     CARD_WIDTH,
     CARD_GAP,
 ), CARD_HEIGHT);
@@ -78,51 +81,49 @@ pub fn show(lvl: u32) void {
 }
 
 fn prepare_skills() void {
-    is_showing_skills = true;
-    visible_cards_count = 0;
+    cards_count = 0;
 
     rand_algo.shuffle(skillsInfo.SkillId, skills_pool.items);
 
     for (skills_pool.items, 0..) |skill_id, i| {
-        visible_cards_count += 1;
-        visible_skills[i] = skill_id;
+        cards_count += 1;
         const skill = skillsInfo.find_skill_by_id(skill_id);
-
         const pos_x = rutils.calc_child_pos(i, PANEL_RECT.x, CARD_WIDTH, CARD_GAP);
-        transforms[i] = rutils.new_rect(pos_x, PANEL_RECT.y, CARD_WIDTH, CARD_HEIGHT);
+        const transform = rutils.new_rect(pos_x, PANEL_RECT.y, CARD_WIDTH, CARD_HEIGHT);
+        const name_bounds = rutils.rect_with_padding(transform, 0, CARD_NAME_Y_PADDING);
 
-        const name_bounds = rutils.rect_with_padding(transforms[i], 0, CARD_NAME_Y_PADDING);
-        names[i] = Text.init_aligned(skill.name, .Big, name_bounds, .Top);
+        cards[i] = .{
+            .id = .{ .skill = skill_id },
+            .transform = transform,
+            .name = Text.init_aligned(skill.name, .Big, name_bounds, .Top),
+            .description = Text.init_aligned(skill.description, .Medium, transform, .AllCenter),
+        };
 
-        const description_bounds = transforms[i];
-        descriptions[i] = Text.init_aligned(skill.description, .Medium, description_bounds, .AllCenter);
-
-        if (i == MAX_VISIBLE_UPGRADES - 1) {
+        if (i == MAX_VISIBLE_CARDS - 1) {
             break;
         }
     }
 }
 
 fn prepare_upgrades() void {
-    is_showing_skills = false;
-    visible_cards_count = 0;
+    cards_count = 0;
     rand_algo.shuffle(skillsInfo.UpgradeId, upgrades_pool.items);
 
     for (upgrades_pool.items, 0..) |id, i| {
-        visible_cards_count += 1;
-        visible_upgrades[i] = id;
+        cards_count += 1;
         const upgrade = skillsInfo.find_upgrade_by_id(id) orelse unreachable;
-
         const pos_x = rutils.calc_child_pos(i, PANEL_RECT.x, CARD_WIDTH, CARD_GAP);
-        transforms[i] = rutils.new_rect(pos_x, PANEL_RECT.y, CARD_WIDTH, CARD_HEIGHT);
+        const transform = rutils.new_rect(pos_x, PANEL_RECT.y, CARD_WIDTH, CARD_HEIGHT);
+        const name_bounds = rutils.rect_with_padding(transform, 0, CARD_NAME_Y_PADDING);
 
-        const name_bounds = rutils.rect_with_padding(transforms[i], 0, CARD_NAME_Y_PADDING);
-        names[i] = Text.init_aligned(upgrade.name, .Big, name_bounds, .Top);
+        cards[i] = .{
+            .id = .{ .upgrade = id },
+            .transform = transform,
+            .name = Text.init_aligned(upgrade.name, .Big, name_bounds, .Top),
+            .description = Text.init_aligned(upgrade.description, .Medium, transform, .AllCenter),
+        };
 
-        const description_bounds = transforms[i];
-        descriptions[i] = Text.init_aligned(upgrade.description, .Medium, description_bounds, .AllCenter);
-
-        if (i == MAX_VISIBLE_UPGRADES - 1) {
+        if (i == MAX_VISIBLE_CARDS - 1) {
             break;
         }
     }
@@ -134,22 +135,25 @@ pub fn update(player: *Player) void {
     }
 
     hovered_card_index = -1;
-    for (0..visible_cards_count) |i| {
-        const transform = transforms[i];
+
+    for (0..cards_count) |i| {
+        const transform = cards[i].transform;
         if (rl.CheckCollisionPointRec(rl.GetMousePosition(), transform)) {
             hovered_card_index = @intCast(i);
 
             if (rl.IsMouseButtonPressed(rl.MOUSE_BUTTON_LEFT)) {
-                if (is_showing_skills) {
-                    const skill_to_add = visible_skills[i];
-                    add_skill_upgrades_to_pool(skill_to_add);
+                switch (cards[i].id) {
+                    .skill => |skill_to_add| {
+                        add_skill_upgrades_to_pool(skill_to_add);
 
-                    _ = skills_pool.swapRemove(i);
-                    player.add_skill(skill_to_add);
-                } else {
-                    const upgade_to_add = visible_upgrades[i];
-                    player.add_upgrade(upgade_to_add);
+                        _ = skills_pool.swapRemove(i);
+                        player.add_skill(skill_to_add);
+                    },
+                    .upgrade => |upgrade_to_add| {
+                        player.add_upgrade(upgrade_to_add);
+                    },
                 }
+
                 visible = false;
                 game_paused.* = false;
             }
@@ -168,16 +172,12 @@ fn add_skill_upgrades_to_pool(skill_id: skillsInfo.SkillId) void {
 
 pub fn draw() void {
     if (visible) {
-        for (0..visible_cards_count) |i| {
-            const transform = transforms[i];
+        for (0..cards_count) |i| {
             const color = if (hovered_card_index == i) rl.DARKGREEN else rl.BROWN;
-            rl.DrawRectangleRec(transform, color);
+            rl.DrawRectangleRec(cards[i].transform, color);
 
-            const name = names[i];
-            name.draw();
-
-            const description = descriptions[i];
-            description.draw();
+            cards[i].name.draw();
+            cards[i].description.draw();
         }
     }
 }

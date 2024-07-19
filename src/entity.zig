@@ -25,7 +25,6 @@ hit_color: rl.Color,
 hit_time_passed: f32 = 0,
 hit_pos: rl.Vector2 = undefined,
 hit_text: [8]u8 = undefined,
-hit_text_slice: [:0]u8 = undefined,
 hit_text_x_offset: f32 = 0,
 
 const HIT_TIMEOUT: f32 = 0.4;
@@ -50,7 +49,7 @@ fn hit(self: *Self, dmg: i32) void {
     self.is_invurnable = true;
     self.hit_time_passed = 0;
     self.hit_pos = rutils.new_vector2(self.transform.x + self.transform.width + 10, self.transform.y - 15);
-    self.hit_text_slice = std.fmt.bufPrintZ(&self.hit_text, "{d}", .{dmg}) catch {
+    _ = std.fmt.bufPrintZ(&self.hit_text, "{d}", .{dmg}) catch {
         unreachable;
     };
 
@@ -117,6 +116,6 @@ pub fn draw(self: *const Self, base_color: rl.Color) void {
 // TODO: should move it to sep. module
 pub fn draw_hit_text(self: *const Self) void {
     if (self.is_invurnable) {
-        fonts.draw_text(self.hit_text_slice, self.hit_pos, .Bigger, self.hit_color);
+        fonts.draw_text(&self.hit_text, self.hit_pos, .Bigger, self.hit_color);
     }
 }
