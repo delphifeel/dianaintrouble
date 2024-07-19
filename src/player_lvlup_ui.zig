@@ -11,7 +11,7 @@ const Player = @import("player.zig");
 
 pub var visible = false;
 
-const MAX_UPGRADES = 3;
+const MAX_VISIBLE_UPGRADES = 3;
 
 var rand_algo: std.rand.Random = undefined;
 var skills_pool: std.ArrayList(skillsInfo.SkillId) = undefined;
@@ -21,19 +21,23 @@ var game_paused: *bool = undefined;
 
 var hovered_card_index: i32 = -1;
 var is_showing_skills = false;
-var visible_skills: [MAX_UPGRADES]skillsInfo.SkillId = undefined;
-var visible_upgrades: [MAX_UPGRADES]skillsInfo.UpgradeId = undefined;
+var visible_skills: [MAX_VISIBLE_UPGRADES]skillsInfo.SkillId = undefined;
+var visible_upgrades: [MAX_VISIBLE_UPGRADES]skillsInfo.UpgradeId = undefined;
 
 var visible_cards_count: u32 = 0;
-var transforms: [MAX_UPGRADES]rl.Rectangle = undefined;
-var names: [MAX_UPGRADES]Text = undefined;
-var descriptions: [MAX_UPGRADES]Text = undefined;
+var transforms: [MAX_VISIBLE_UPGRADES]rl.Rectangle = undefined;
+var names: [MAX_VISIBLE_UPGRADES]Text = undefined;
+var descriptions: [MAX_VISIBLE_UPGRADES]Text = undefined;
 
 const CARD_HEIGHT = screen.remy(50);
 const CARD_WIDTH = screen.remx(20);
 const CARD_GAP = screen.remx(8);
 const CARD_NAME_Y_PADDING = screen.remy(2);
-const PANEL_RECT = rutils.new_rect_in_center(rutils.calc_panel_size(MAX_UPGRADES, CARD_WIDTH, CARD_GAP), CARD_HEIGHT);
+const PANEL_RECT = rutils.new_rect_in_center(rutils.calc_panel_size(
+    MAX_VISIBLE_UPGRADES,
+    CARD_WIDTH,
+    CARD_GAP,
+), CARD_HEIGHT);
 
 pub fn init(_allocator: std.mem.Allocator, _game_paused: *bool, player: *const Player) void {
     allocator = _allocator;
@@ -43,14 +47,15 @@ pub fn init(_allocator: std.mem.Allocator, _game_paused: *bool, player: *const P
 
     const skills_ids = std.enums.values(skillsInfo.SkillId);
     skills_pool = std.ArrayList(skillsInfo.SkillId).initCapacity(allocator, skills_ids.len) catch h.oom();
+    upgrades_pool = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, 10) catch h.oom();
+
     for (skills_ids) |skill_id| {
         if (player.has_active_skill(skill_id)) {
+            add_skill_upgrades_to_pool(skill_id);
             continue;
         }
         skills_pool.append(skill_id) catch h.oom();
     }
-
-    upgrades_pool = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, 10) catch h.oom();
 }
 
 pub fn deinit() void {
@@ -92,7 +97,7 @@ fn prepare_skills() void {
         const description_bounds = transforms[i];
         descriptions[i] = Text.init_aligned(skill.description, .Medium, description_bounds, .AllCenter);
 
-        if (i == MAX_UPGRADES - 1) {
+        if (i == MAX_VISIBLE_UPGRADES - 1) {
             break;
         }
     }
@@ -106,18 +111,18 @@ fn prepare_upgrades() void {
     for (upgrades_pool.items, 0..) |id, i| {
         visible_cards_count += 1;
         visible_upgrades[i] = id;
-        const upgrade = skillsInfo.find_upgrade_by_id(id);
+        const upgrade = skillsInfo.find_upgrade_by_id(id) orelse unreachable;
 
         const pos_x = rutils.calc_child_pos(i, PANEL_RECT.x, CARD_WIDTH, CARD_GAP);
         transforms[i] = rutils.new_rect(pos_x, PANEL_RECT.y, CARD_WIDTH, CARD_HEIGHT);
 
         const name_bounds = rutils.rect_with_padding(transforms[i], 0, CARD_NAME_Y_PADDING);
-        names[i] = Text.init_aligned(upgrade.info.name, .Big, name_bounds, .Top);
+        names[i] = Text.init_aligned(upgrade.name, .Big, name_bounds, .Top);
 
         const description_bounds = transforms[i];
-        descriptions[i] = Text.init_aligned(upgrade.info.description, .Medium, description_bounds, .AllCenter);
+        descriptions[i] = Text.init_aligned(upgrade.description, .Medium, description_bounds, .AllCenter);
 
-        if (i == MAX_UPGRADES - 1) {
+        if (i == MAX_VISIBLE_UPGRADES - 1) {
             break;
         }
     }
@@ -137,19 +142,7 @@ pub fn update(player: *Player) void {
             if (rl.IsMouseButtonPressed(rl.MOUSE_BUTTON_LEFT)) {
                 if (is_showing_skills) {
                     const skill_to_add = visible_skills[i];
-
-                    // filter related upgrades
-                    for (skillsInfo.all_upgrades.kvs) |iter| {
-                        const upgrade = iter.value;
-
-                        if (player.has_active_skill(upgrade.related_skill)) {
-                            continue;
-                        }
-
-                        if (upgrade.related_skill == skill_to_add) {
-                            upgrades_pool.append(upgrade.info.id) catch h.oom();
-                        }
-                    }
+                    add_skill_upgrades_to_pool(skill_to_add);
 
                     _ = skills_pool.swapRemove(i);
                     player.add_skill(skill_to_add);
@@ -163,6 +156,13 @@ pub fn update(player: *Player) void {
 
             break;
         }
+    }
+}
+
+fn add_skill_upgrades_to_pool(skill_id: skillsInfo.SkillId) void {
+    const skill_info = skillsInfo.find_skill_by_id(skill_id);
+    for (skill_info.upgrades) |*upgrade| {
+        upgrades_pool.append(upgrade.id) catch h.oom();
     }
 }
 

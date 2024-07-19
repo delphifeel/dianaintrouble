@@ -11,6 +11,7 @@ transform: rl.Rectangle,
 collider: rl.Rectangle,
 angle: f32,
 dmg: i32 = 10,
+speed: f32 = 300,
 
 const SIZE: f32 = 40;
 const OFFSET_FROM_CENTER: f32 = 150;
@@ -27,7 +28,7 @@ pub fn init(player_center: rl.Vector2) Self {
 }
 
 pub fn update(self: *Self, player_center: rl.Vector2) void {
-    self.angle += rutils.distance_per_frame(300, rl.GetFrameTime());
+    self.angle += rutils.distance_per_frame(self.speed, rl.GetFrameTime());
     if (self.angle >= 360) {
         self.angle = 360 - self.angle;
     }

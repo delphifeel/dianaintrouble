@@ -11,6 +11,7 @@ transforms: [4]rl.Rectangle = undefined,
 colliders: [4]rl.Rectangle = undefined,
 time_passed: f32 = 0,
 dmg: i32 = 5,
+speed: f32 = 400,
 
 const FIRE_TIMEOUT: comptime_float = 2;
 const SIZE: f32 = 50;
@@ -54,7 +55,7 @@ pub fn update(self: *Self, player_center: rl.Vector2) void {
         self.reset(player_center);
     }
 
-    const distance = rutils.distance_per_frame(400, frame_time);
+    const distance = rutils.distance_per_frame(self.speed, frame_time);
 
     self.move_sparkle(0, rutils.new_vector2(-distance, -distance));
     self.move_sparkle(1, rutils.new_vector2(distance, -distance));

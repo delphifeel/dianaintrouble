@@ -11,15 +11,15 @@ const Self = @This();
 time_passed: f32,
 list: std.ArrayList(Meteor),
 dmg: i32 = 20,
+spawn_timeout: f32 = 3,
 
 const MAX_METEORS = 100;
-const SPAWN_EVERY: f32 = 1;
 
 pub fn update(self: *Self, player_pos: rl.Vector2) void {
     const frame_time = rl.GetFrameTime();
     self.time_passed += frame_time;
     var need_to_spawn = false;
-    if (self.time_passed >= SPAWN_EVERY) {
+    if (self.time_passed >= self.spawn_timeout) {
         need_to_spawn = true;
         self.time_passed = 0;
     }

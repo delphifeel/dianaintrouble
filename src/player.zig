@@ -23,6 +23,7 @@ entity: Entity,
 exp: f32,
 lvl: u32,
 exp_progressbar: Progressbar,
+exp_needed_for_lvl: f32 = 5,
 
 // skills
 active_skills: std.ArrayList(skillsInfo.SkillId),
@@ -31,7 +32,6 @@ heart_projectile: HeartProjectile,
 meteors: Meteors,
 sparkles: Sparkles,
 
-const MAX_EXP: f32 = 2;
 const DEFAULT_SKILLS_ARRAY_CAP = 100;
 const START_HEALTH = 10000;
 
@@ -83,15 +83,28 @@ pub fn add_skill(self: *Self, id: skillsInfo.SkillId) void {
     self.active_skills.append(id) catch h.oom();
 }
 
+const UPGRADE_SPEED_FACTOR = 1.1;
+const UPGRADE_DMG_FACTOR = 2;
+
 pub fn add_upgrade(self: *Self, id: skillsInfo.UpgradeId) void {
     self.active_upgrades.append(id) catch h.oom();
+
+    switch (id) {
+        .FasterHeart => self.heart_projectile.speed *= UPGRADE_SPEED_FACTOR,
+        .StrongerHeart => self.heart_projectile.dmg *= UPGRADE_DMG_FACTOR,
+        .FasterMeteors => self.meteors.spawn_timeout /= UPGRADE_SPEED_FACTOR,
+        .StrongerMeteors => self.meteors.dmg *= UPGRADE_DMG_FACTOR,
+        .FasterSparkles => self.sparkles.speed *= UPGRADE_SPEED_FACTOR,
+        .StrongerSparkles => self.sparkles.dmg *= UPGRADE_DMG_FACTOR,
+    }
 }
 
 fn up_exp(self: *Self) void {
     self.exp += 1;
-    if (self.exp > MAX_EXP) {
+    if (self.exp > self.exp_needed_for_lvl) {
         self.exp = 0;
         self.lvl += 1;
+        self.exp_needed_for_lvl *= 1.3;
         player_lvlup_ui.show(self.lvl);
     }
 }
@@ -172,7 +185,7 @@ pub fn deinit(self: *Self) void {
 }
 
 pub fn draw_exp_progress(self: *const Self) void {
-    self.exp_progressbar.draw(self.exp, MAX_EXP);
+    self.exp_progressbar.draw(self.exp, self.exp_needed_for_lvl);
 }
 
 fn init_progress_bar() Progressbar {
