@@ -23,7 +23,7 @@ pub fn find_skill_by_id(skill_id: SkillId) Skill {
 }
 
 pub fn find_upgrade_by_id(id: UpgradeId) SkillUpgrade {
-    return upgrades.get(@tagName(id)).?;
+    return all_upgrades.get(@tagName(id)).?;
 }
 
 const all = std.ComptimeStringMap(Skill, .{
@@ -59,7 +59,7 @@ pub const UpgradeId = enum {
     FasterSparkles,
 };
 
-const upgrades = std.ComptimeStringMap(SkillUpgrade, .{
+pub const all_upgrades = std.ComptimeStringMap(SkillUpgrade, .{
     .{ @tagName(.FasterHeart), .{
         .info = .{
             .id = .FasterHeart,

@@ -64,7 +64,7 @@ pub fn main() !void {
 
     var game_paused = false;
 
-    player_lvlup_ui.init(allocator, &game_paused);
+    player_lvlup_ui.init(allocator, &game_paused, &player);
     defer player_lvlup_ui.deinit();
 
     while (!rl.WindowShouldClose()) {

@@ -32,7 +32,7 @@ meteors: Meteors,
 sparkles: Sparkles,
 
 const MAX_EXP: f32 = 2;
-const DEFAULT_SKILLS_ARRAY_CAP = 10;
+const DEFAULT_SKILLS_ARRAY_CAP = 100;
 const START_HEALTH = 10000;
 
 pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
@@ -68,6 +68,15 @@ pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
             self.up_exp();
         }
     }
+}
+
+pub fn has_active_skill(self: *const Self, id: skillsInfo.SkillId) bool {
+    for (self.active_skills.items) |active_skill_id| {
+        if (active_skill_id == id) {
+            return true;
+        }
+    }
+    return false;
 }
 
 pub fn add_skill(self: *Self, id: skillsInfo.SkillId) void {
