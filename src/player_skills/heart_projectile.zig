@@ -12,13 +12,14 @@ collider: rl.Rectangle,
 angle: f32,
 dmg: f32 = 10,
 speed: f32 = 150,
+offset_from_center: f32 = DEFAULT_OFFSET_FROM_CENTER,
 
+const DEFAULT_OFFSET_FROM_CENTER: comptime_float = 100;
 const SIZE: f32 = 40;
-const OFFSET_FROM_CENTER: f32 = 100;
 const INIT_ANGLE: comptime_float = 270;
 
 pub fn init(player_center: rl.Vector2) Self {
-    const pos = rutils.rotate_vector2(player_center, OFFSET_FROM_CENTER, INIT_ANGLE);
+    const pos = rutils.rotate_vector2(player_center, DEFAULT_OFFSET_FROM_CENTER, INIT_ANGLE);
     const transform = rutils.new_rect_with_center_pos(pos, SIZE, SIZE);
     return Self{
         .transform = transform,
@@ -32,7 +33,7 @@ pub fn update(self: *Self, player_center: rl.Vector2) void {
     if (self.angle >= 360) {
         self.angle = 360 - self.angle;
     }
-    const new_pos = rutils.rotate_vector2(player_center, OFFSET_FROM_CENTER, self.angle);
+    const new_pos = rutils.rotate_vector2(player_center, self.offset_from_center, self.angle);
     self.transform = rutils.new_rect_with_center_pos(new_pos, SIZE, SIZE);
     self.collider = self.transform;
 }

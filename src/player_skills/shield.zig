@@ -10,9 +10,8 @@ const Self = @This();
 transform: ?rl.Rectangle,
 
 time_passed: f32 = 0,
-restore_count: f32 = 5,
-// restore_timeout: f32 = 10,
-restore_timeout: f32 = 2,
+restore_amount: f32 = 5,
+restore_timeout: f32 = 10,
 
 const SIZE = 20;
 
@@ -29,13 +28,15 @@ pub fn init(player_center: rl.Vector2) Self {
     };
 }
 
+pub fn deinit(_: *Self) void {}
+
 pub fn update(self: *Self, player: *Player) void {
     if (player.entity.shield == 0) {
         self.time_passed += rl.GetFrameTime();
     }
     if (self.time_passed >= self.restore_timeout) {
         self.time_passed = 0;
-        player.entity.shield = @intFromFloat(self.restore_count);
+        player.entity.shield = @intFromFloat(self.restore_amount);
     }
     if (player.entity.shield > 0) {
         self.transform = calc_transform(player.entity.position_center);

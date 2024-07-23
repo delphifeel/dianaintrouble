@@ -27,7 +27,7 @@ lvl: u32,
 hp_bar: Progressbar,
 // TODO: move to sep. module
 exp_progressbar: Progressbar,
-exp_needed_for_lvl: f32 = 5,
+exp_needed_for_lvl: f32 = 4,
 
 // skills
 active_skills: std.ArrayList(skillsInfo.SkillId),
@@ -38,9 +38,41 @@ sparkles: Sparkles,
 shield_skill: Shield,
 
 const DEFAULT_SKILLS_ARRAY_CAP = 100;
-// TODO: add max hp instead
-// const START_HEALTH = 40;
-const START_HEALTH = 200;
+const START_HEALTH = 40;
+// const START_HEALTH = 200;
+
+pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
+    const entity = Entity.init(pos, 60, START_HEALTH, rl.RED);
+    var meteors = Meteors.init(allocator);
+
+    var skills = std.ArrayList(skillsInfo.SkillId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
+    // default skills
+    skills.append(skillsInfo.SkillId.Heart) catch h.oom();
+    const upgrades = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
+
+    return Self{
+        .entity = entity,
+        .heart_projectile = HeartProjectile.init(entity.position_center),
+        .sparkles = Sparkles.init(entity.position_center),
+        .shield_skill = Shield.init(entity.position_center),
+        .meteors = meteors,
+        .exp = 0,
+        .lvl = 1,
+        .exp_progressbar = init_exp_bar(),
+        .hp_bar = init_hp_bar(entity.position_center),
+        .active_skills = skills,
+        .active_upgrades = upgrades,
+    };
+}
+
+pub fn deinit(self: *Self) void {
+    self.entity.deinit();
+    self.meteors.deinit();
+    self.sparkles.deinit();
+    self.active_skills.deinit();
+    self.active_upgrades.deinit();
+    self.shield_skill.deinit();
+}
 
 pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
     var dmg_sum: f32 = 0;
@@ -96,14 +128,19 @@ pub fn add_upgrade(self: *Self, id: skillsInfo.UpgradeId) void {
     self.active_upgrades.append(id) catch h.oom();
 
     switch (id) {
-        .ShieldEndurence => self.entity.health += 1,
+        .HeartRange => self.heart_projectile.offset_from_center *= 1.1,
+        .ShieldEndurence => {
+            self.entity.health += 1;
+            self.entity.max_health += 1;
+        },
+        .ShieldFasterRestore => self.shield_skill.restore_timeout *= 0.9,
         .SparklesBigger => self.sparkles.size *= 1.3,
-        .FasterHeart => self.heart_projectile.speed *= 1.1,
-        .StrongerHeart => self.heart_projectile.dmg *= 1.1,
+        .HeartFaster => self.heart_projectile.speed *= 1.1,
+        .HeartStronger => self.heart_projectile.dmg *= 1.1,
         .MeteorsFasterSpawn => self.meteors.spawn_timeout *= 0.9,
-        .StrongerMeteors => self.meteors.dmg *= 1.1,
+        .MeteorsStronger => self.meteors.dmg *= 1.1,
         .SparklesFasterSpawn => self.sparkles.fire_timeout *= 0.9,
-        .StrongerSparkles => self.sparkles.dmg *= 1.1,
+        .SparklesStronger => self.sparkles.dmg *= 1.1,
     }
 }
 
@@ -173,51 +210,8 @@ pub fn draw(self: *const Self) void {
 
 fn draw_hp_bar(self: *const Self) void {
     const hp_f: f32 = @floatFromInt(self.entity.health);
-    const start_hp_f: f32 = @floatFromInt(START_HEALTH);
-    self.hp_bar.draw(hp_f, start_hp_f);
-}
-
-pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
-    const entity = Entity.init(pos, 60, START_HEALTH, rl.RED);
-    var meteors = Meteors.init(allocator);
-
-    var skills = std.ArrayList(skillsInfo.SkillId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
-    // default skills
-    // skills.append(skillsInfo.SkillId.Heart) catch h.oom();
-    skills.append(skillsInfo.SkillId.Shield) catch h.oom();
-    const upgrades = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
-
-    return Self{
-        .entity = entity,
-        .heart_projectile = HeartProjectile.init(entity.position_center),
-        .sparkles = Sparkles.init(entity.position_center),
-        .shield_skill = Shield.init(entity.position_center),
-        .meteors = meteors,
-        .exp = 0,
-        .lvl = 1,
-        .exp_progressbar = init_exp_bar(),
-        .hp_bar = init_hp_bar(entity.position_center),
-        .active_skills = skills,
-        .active_upgrades = upgrades,
-    };
-}
-
-pub fn deinit(self: *Self) void {
-    self.entity.deinit();
-    self.meteors.deinit();
-    self.sparkles.deinit();
-    self.active_skills.deinit();
-    self.active_upgrades.deinit();
-}
-
-pub fn draw_exp_progress(self: *const Self) void {
-    self.exp_progressbar.draw(self.exp, self.exp_needed_for_lvl);
-}
-
-fn calc_hp_bar_transform(player_center: rl.Vector2) rl.Rectangle {
-    var pos = player_center;
-    pos.y -= 40;
-    return rutils.new_rect_with_center_pos(pos, 70, 12);
+    const max_hp_f: f32 = @floatFromInt(self.entity.max_health);
+    self.hp_bar.draw(hp_f, max_hp_f);
 }
 
 fn init_hp_bar(player_center: rl.Vector2) Progressbar {
@@ -226,6 +220,16 @@ fn init_hp_bar(player_center: rl.Vector2) Progressbar {
         .background_color = rl.GRAY,
         .fill_color = rl.GREEN,
     };
+}
+
+fn calc_hp_bar_transform(player_center: rl.Vector2) rl.Rectangle {
+    var pos = player_center;
+    pos.y -= 40;
+    return rutils.new_rect_with_center_pos(pos, 70, 12);
+}
+
+pub fn draw_exp_progress(self: *const Self) void {
+    self.exp_progressbar.draw(self.exp, self.exp_needed_for_lvl);
 }
 
 fn init_exp_bar() Progressbar {

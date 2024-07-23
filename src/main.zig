@@ -77,6 +77,10 @@ pub fn main() !void {
 
             if (!game_paused) {
                 player.update();
+                // TODO: death screen
+                if (player.entity.is_dead) {
+                    game_paused = true;
+                }
                 camera_follow_player(&camera, &player);
                 enemies.update(&player);
             }

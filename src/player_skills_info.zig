@@ -16,14 +16,19 @@ pub const SkillId = enum {
 
 // TODO: we need max values (speed, dmg etc) for upgrades
 pub const UpgradeId = enum {
-    FasterHeart,
-    StrongerHeart,
+    HeartRange,
+    HeartFaster,
+    HeartStronger,
+
     MeteorsFasterSpawn,
-    StrongerMeteors,
+    MeteorsStronger,
+
     SparklesFasterSpawn,
-    StrongerSparkles,
+    SparklesStronger,
     SparklesBigger,
+
     ShieldEndurence,
+    ShieldFasterRestore,
 };
 
 pub const Skill = struct {
@@ -66,6 +71,11 @@ const all_skills = std.ComptimeStringMap(Skill, .{
                 .name = "Endurenct",
                 .description = "+ Max HP",
             },
+            .{
+                .id = .ShieldFasterRestore,
+                .name = "ShieldFasterRestore",
+                .description = "ShieldFasterRestore",
+            },
         },
     } },
     .{ @tagName(.Heart), .{
@@ -74,14 +84,19 @@ const all_skills = std.ComptimeStringMap(Skill, .{
         .description = "Heart going around player",
         .upgrades = &.{
             .{
-                .id = .FasterHeart,
+                .id = .HeartFaster,
                 .name = "Faster Heart",
                 .description = "Faster Heart",
             },
             .{
-                .id = .StrongerHeart,
-                .name = "StrongerHeart",
-                .description = "StrongerHeart",
+                .id = .HeartStronger,
+                .name = "HeartStronger",
+                .description = "HeartStronger",
+            },
+            .{
+                .id = .HeartRange,
+                .name = "HeartRange",
+                .description = "HeartRange",
             },
         },
     } },
@@ -96,9 +111,9 @@ const all_skills = std.ComptimeStringMap(Skill, .{
                 .description = "Faster Meteors Spawn",
             },
             .{
-                .id = .StrongerMeteors,
-                .name = "StrongerMeteors",
-                .description = "StrongerMeteors",
+                .id = .MeteorsStronger,
+                .name = "MeteorsStronger",
+                .description = "MeteorsStronger",
             },
         },
     } },
@@ -113,9 +128,9 @@ const all_skills = std.ComptimeStringMap(Skill, .{
                 .description = "Faster Sparkles Spawn",
             },
             .{
-                .id = .StrongerSparkles,
-                .name = "StrongerSparkles",
-                .description = "StrongerSparkles",
+                .id = .SparklesStronger,
+                .name = "SparklesStronger",
+                .description = "SparklesStronger",
             },
             .{
                 .id = .SparklesBigger,

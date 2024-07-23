@@ -18,6 +18,7 @@ transform: rl.Rectangle,
 position_center: rl.Vector2,
 collider: rl.Rectangle,
 health: i32,
+max_health: i32,
 
 shield: i32 = 0,
 is_dead: bool = false,
@@ -30,41 +31,6 @@ hit_text_x_offset: f32 = 0,
 
 const HIT_TIMEOUT: f32 = 0.4;
 
-// hit with timeout
-pub fn try_hit(self: *Self, dmg: f32) void {
-    if (self.health <= 0) {
-        return;
-    }
-    if (self.is_invurnable) {
-        return;
-    }
-
-    self.hit(dmg);
-}
-
-fn hit(self: *Self, dmg: f32) void {
-    const distance_per_frame = rutils.distance_per_frame(100, rl.GetFrameTime());
-    self.hit_text_x_offset = rutils.rand_f(-distance_per_frame, distance_per_frame);
-
-    const dmg_i: i32 = @intFromFloat(dmg);
-    if (self.shield > 0) {
-        self.shield = if (dmg_i > self.shield) 0 else (self.shield - dmg_i);
-    } else {
-        self.health -= dmg_i;
-    }
-
-    self.is_invurnable = true;
-    self.hit_time_passed = 0;
-    self.hit_pos = rutils.new_vector2(self.transform.x + self.transform.width + 10, self.transform.y - 15);
-    _ = std.fmt.bufPrintZ(&self.hit_text, "{d}", .{dmg_i}) catch {
-        unreachable;
-    };
-
-    if (self.health <= 0) {
-        self.is_dead = true;
-    }
-}
-
 pub fn init(center_pos: rl.Vector2, size: f32, start_health: i32, hit_color: rl.Color) Self {
     var transform = rutils.new_rect(center_pos.x - size / 2, center_pos.y - size / 2, size, size);
     transform = rutils.find_nearest_rect_inside_world(transform);
@@ -75,6 +41,7 @@ pub fn init(center_pos: rl.Vector2, size: f32, start_health: i32, hit_color: rl.
         .position_center = position_center,
         .collider = transform,
         .health = start_health,
+        .max_health = start_health,
         .hit_color = hit_color,
     };
 }
@@ -118,6 +85,41 @@ pub fn draw(self: *const Self, base_color: rl.Color) void {
         color = rl.Fade(color, 0.7);
     }
     rl.DrawRectangleRec(self.transform, color);
+}
+
+// hit with timeout
+pub fn try_hit(self: *Self, dmg: f32) void {
+    if (self.health <= 0) {
+        return;
+    }
+    if (self.is_invurnable) {
+        return;
+    }
+
+    self.hit(dmg);
+}
+
+fn hit(self: *Self, dmg: f32) void {
+    const distance_per_frame = rutils.distance_per_frame(100, rl.GetFrameTime());
+    self.hit_text_x_offset = rutils.rand_f(-distance_per_frame, distance_per_frame);
+
+    const dmg_i: i32 = @intFromFloat(dmg);
+    if (self.shield > 0) {
+        self.shield = if (dmg_i > self.shield) 0 else (self.shield - dmg_i);
+    } else {
+        self.health -= dmg_i;
+    }
+
+    self.is_invurnable = true;
+    self.hit_time_passed = 0;
+    self.hit_pos = rutils.new_vector2(self.transform.x + self.transform.width + 10, self.transform.y - 15);
+    _ = std.fmt.bufPrintZ(&self.hit_text, "{d}", .{dmg_i}) catch {
+        unreachable;
+    };
+
+    if (self.health <= 0) {
+        self.is_dead = true;
+    }
 }
 
 // TODO: should move it to sep. module
