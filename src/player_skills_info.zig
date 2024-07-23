@@ -23,6 +23,7 @@ pub const UpgradeId = enum {
     SparklesFasterSpawn,
     StrongerSparkles,
     SparklesBigger,
+    ShieldEndurence,
 };
 
 pub const Skill = struct {
@@ -59,7 +60,13 @@ const all_skills = std.ComptimeStringMap(Skill, .{
         .id = .Shield,
         .name = "Shield",
         .description = "Shield",
-        .upgrades = &.{},
+        .upgrades = &.{
+            .{
+                .id = .ShieldEndurence,
+                .name = "Endurenct",
+                .description = "+ Max HP",
+            },
+        },
     } },
     .{ @tagName(.Heart), .{
         .id = .Heart,

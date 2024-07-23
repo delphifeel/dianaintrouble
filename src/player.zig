@@ -38,6 +38,7 @@ sparkles: Sparkles,
 shield_skill: Shield,
 
 const DEFAULT_SKILLS_ARRAY_CAP = 100;
+// TODO: add max hp instead
 // const START_HEALTH = 40;
 const START_HEALTH = 200;
 
@@ -95,6 +96,7 @@ pub fn add_upgrade(self: *Self, id: skillsInfo.UpgradeId) void {
     self.active_upgrades.append(id) catch h.oom();
 
     switch (id) {
+        .ShieldEndurence => self.entity.health += 1,
         .SparklesBigger => self.sparkles.size *= 1.3,
         .FasterHeart => self.heart_projectile.speed *= 1.1,
         .StrongerHeart => self.heart_projectile.dmg *= 1.1,
