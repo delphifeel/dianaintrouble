@@ -16,13 +16,17 @@ const Enemies = @This();
 list: std.ArrayList(Enemy),
 time_passed: f32,
 
-var maxEnemiesPerRespawn: i32 = 30;
-// TODO: seg. fault on this values
-const START_ENEMIES_COUNT: f32 = 100;
-const RESPAWN_COUNT_INC = 5;
+// DEBUG
+var maxEnemiesPerRespawn: i32 = 0;
+const START_ENEMIES_COUNT: f32 = 400;
+const RESPAWN_COUNT_INC = 100;
+
+// var maxEnemiesPerRespawn: i32 = 0;
+// const START_ENEMIES_COUNT: f32 = 4;
+// const RESPAWN_COUNT_INC = 4;
 const MIN_OFFSET: f32 = 700;
 const MAX_OFFSET: f32 = 900;
-const SPAWN_EVERY: f32 = 3;
+const SPAWN_EVERY: f32 = 10;
 
 pub fn spawn(allocator: std.mem.Allocator, player_center: rl.Vector2) Enemies {
     var enemies = std.ArrayList(Enemy).initCapacity(allocator, START_ENEMIES_COUNT * 10) catch h.oom();

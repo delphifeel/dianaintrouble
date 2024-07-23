@@ -19,6 +19,7 @@ position_center: rl.Vector2,
 collider: rl.Rectangle,
 health: i32,
 
+shield: i32 = 0,
 is_dead: bool = false,
 is_invurnable: bool = false,
 hit_color: rl.Color,
@@ -30,7 +31,7 @@ hit_text_x_offset: f32 = 0,
 const HIT_TIMEOUT: f32 = 0.4;
 
 // hit with timeout
-pub fn try_hit(self: *Self, dmg: i32) void {
+pub fn try_hit(self: *Self, dmg: f32) void {
     if (self.health <= 0) {
         return;
     }
@@ -41,15 +42,21 @@ pub fn try_hit(self: *Self, dmg: i32) void {
     self.hit(dmg);
 }
 
-fn hit(self: *Self, dmg: i32) void {
+fn hit(self: *Self, dmg: f32) void {
     const distance_per_frame = rutils.distance_per_frame(100, rl.GetFrameTime());
     self.hit_text_x_offset = rutils.rand_f(-distance_per_frame, distance_per_frame);
 
-    self.health -= dmg;
+    const dmg_i: i32 = @intFromFloat(dmg);
+    if (self.shield > 0) {
+        self.shield = if (dmg_i > self.shield) 0 else (self.shield - dmg_i);
+    } else {
+        self.health -= dmg_i;
+    }
+
     self.is_invurnable = true;
     self.hit_time_passed = 0;
     self.hit_pos = rutils.new_vector2(self.transform.x + self.transform.width + 10, self.transform.y - 15);
-    _ = std.fmt.bufPrintZ(&self.hit_text, "{d}", .{dmg}) catch {
+    _ = std.fmt.bufPrintZ(&self.hit_text, "{d}", .{dmg_i}) catch {
         unreachable;
     };
 

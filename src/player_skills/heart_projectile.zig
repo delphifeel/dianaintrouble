@@ -10,11 +10,11 @@ const Self = @This();
 transform: rl.Rectangle,
 collider: rl.Rectangle,
 angle: f32,
-dmg: i32 = 10,
-speed: f32 = 300,
+dmg: f32 = 10,
+speed: f32 = 150,
 
 const SIZE: f32 = 40;
-const OFFSET_FROM_CENTER: f32 = 150;
+const OFFSET_FROM_CENTER: f32 = 100;
 const INIT_ANGLE: comptime_float = 270;
 
 pub fn init(player_center: rl.Vector2) Self {

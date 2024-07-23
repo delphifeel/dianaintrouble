@@ -12,8 +12,12 @@ const Self = @This();
 
 entity: Entity,
 
+const DMG = 10;
+// const HEALTH = 40;
+const HEALTH = 5;
+
 pub fn init(pos: rl.Vector2) Self {
-    var entity = Entity.init(pos, 50, 20, rl.GREEN);
+    var entity = Entity.init(pos, 50, HEALTH, rl.GREEN);
     return Self{
         .entity = entity,
     };
@@ -33,7 +37,7 @@ pub fn update(self: *Self, player_entity: *Entity) void {
 
     if (!self.entity.is_dead) {
         if (rl.CheckCollisionRecs(self.entity.collider, player_entity.collider)) {
-            player_entity.try_hit(1);
+            player_entity.try_hit(DMG);
         }
     }
 

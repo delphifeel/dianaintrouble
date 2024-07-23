@@ -11,16 +11,18 @@ pub const SkillId = enum {
     Heart,
     Meteors,
     Sparkles,
+    Shield,
 };
 
 // TODO: we need max values (speed, dmg etc) for upgrades
 pub const UpgradeId = enum {
     FasterHeart,
     StrongerHeart,
-    FasterMeteors,
+    MeteorsFasterSpawn,
     StrongerMeteors,
-    FasterSparkles,
+    SparklesFasterSpawn,
     StrongerSparkles,
+    SparklesBigger,
 };
 
 pub const Skill = struct {
@@ -53,6 +55,12 @@ pub fn find_upgrade_by_id(id: UpgradeId) ?Upgrade {
 }
 
 const all_skills = std.ComptimeStringMap(Skill, .{
+    .{ @tagName(.Shield), .{
+        .id = .Shield,
+        .name = "Shield",
+        .description = "Shield",
+        .upgrades = &.{},
+    } },
     .{ @tagName(.Heart), .{
         .id = .Heart,
         .name = "Heart",
@@ -76,9 +84,9 @@ const all_skills = std.ComptimeStringMap(Skill, .{
         .description = "Meteors",
         .upgrades = &.{
             .{
-                .id = .FasterMeteors,
-                .name = "Faster Meteors",
-                .description = "Faster Meteors",
+                .id = .MeteorsFasterSpawn,
+                .name = "Faster Meteors Spawn",
+                .description = "Faster Meteors Spawn",
             },
             .{
                 .id = .StrongerMeteors,
@@ -93,14 +101,19 @@ const all_skills = std.ComptimeStringMap(Skill, .{
         .description = "Sparkles",
         .upgrades = &.{
             .{
-                .id = .FasterSparkles,
-                .name = "Faster Sparkles",
-                .description = "Faster Sparkles",
+                .id = .SparklesFasterSpawn,
+                .name = "Faster Sparkles Spawn",
+                .description = "Faster Sparkles Spawn",
             },
             .{
                 .id = .StrongerSparkles,
                 .name = "StrongerSparkles",
                 .description = "StrongerSparkles",
+            },
+            .{
+                .id = .SparklesBigger,
+                .name = "Sparkles Bigger",
+                .description = "Sparkles Bigger",
             },
         },
     } },

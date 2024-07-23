@@ -11,8 +11,10 @@ const fonts = @import("gui/fonts.zig");
 const HeartProjectile = @import("player_skills/heart_projectile.zig");
 const Meteors = @import("player_skills/meteors.zig");
 const Sparkles = @import("player_skills/sparkles.zig");
+const Shield = @import("player_skills/shield.zig");
 const Entity = @import("entity.zig");
 const Background = @import("background.zig");
+
 const screen = @import("screen.zig");
 const player_lvlup_ui = @import("player_lvlup_ui.zig");
 const skillsInfo = @import("player_skills_info.zig");
@@ -31,15 +33,19 @@ active_upgrades: std.ArrayList(skillsInfo.UpgradeId),
 heart_projectile: HeartProjectile,
 meteors: Meteors,
 sparkles: Sparkles,
+shield_skill: Shield,
 
 const DEFAULT_SKILLS_ARRAY_CAP = 100;
-const START_HEALTH = 10000;
+// const START_HEALTH = 40;
+const START_HEALTH = 400000;
 
 pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
-    var dmg_sum: i32 = 0;
+    var dmg_sum: f32 = 0;
 
     for (self.active_skills.items) |skill_id| {
         switch (skill_id) {
+            // TODO: is shield special case ?
+            .Shield => {},
             .Heart => {
                 if (rl.CheckCollisionRecs(enemy_entity.collider, self.heart_projectile.collider)) {
                     dmg_sum += self.heart_projectile.dmg;
@@ -83,19 +89,17 @@ pub fn add_skill(self: *Self, id: skillsInfo.SkillId) void {
     self.active_skills.append(id) catch h.oom();
 }
 
-const UPGRADE_SPEED_FACTOR = 1.1;
-const UPGRADE_DMG_FACTOR = 2;
-
 pub fn add_upgrade(self: *Self, id: skillsInfo.UpgradeId) void {
     self.active_upgrades.append(id) catch h.oom();
 
     switch (id) {
-        .FasterHeart => self.heart_projectile.speed *= UPGRADE_SPEED_FACTOR,
-        .StrongerHeart => self.heart_projectile.dmg *= UPGRADE_DMG_FACTOR,
-        .FasterMeteors => self.meteors.spawn_timeout /= UPGRADE_SPEED_FACTOR,
-        .StrongerMeteors => self.meteors.dmg *= UPGRADE_DMG_FACTOR,
-        .FasterSparkles => self.sparkles.speed *= UPGRADE_SPEED_FACTOR,
-        .StrongerSparkles => self.sparkles.dmg *= UPGRADE_DMG_FACTOR,
+        .SparklesBigger => self.sparkles.size *= 1.3,
+        .FasterHeart => self.heart_projectile.speed *= 1.1,
+        .StrongerHeart => self.heart_projectile.dmg *= 1.1,
+        .MeteorsFasterSpawn => self.meteors.spawn_timeout *= 0.9,
+        .StrongerMeteors => self.meteors.dmg *= 1.1,
+        .SparklesFasterSpawn => self.sparkles.fire_timeout *= 0.9,
+        .StrongerSparkles => self.sparkles.dmg *= 1.1,
     }
 }
 
@@ -133,6 +137,7 @@ pub fn update(self: *Self) void {
 fn update_skills(self: *Self) void {
     for (self.active_skills.items) |skill_id| {
         switch (skill_id) {
+            .Shield => self.shield_skill.update(self),
             .Heart => self.heart_projectile.update(self.entity.position_center),
             .Meteors => self.meteors.update(self.entity.position_center),
             .Sparkles => self.sparkles.update(self.entity.position_center),
@@ -143,6 +148,7 @@ fn update_skills(self: *Self) void {
 pub fn draw_skills(self: *const Self) void {
     for (self.active_skills.items) |skill_id| {
         switch (skill_id) {
+            .Shield => self.shield_skill.draw(),
             .Heart => self.heart_projectile.draw(),
             .Meteors => self.meteors.draw(),
             .Sparkles => self.sparkles.draw(),
@@ -160,13 +166,15 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
 
     var skills = std.ArrayList(skillsInfo.SkillId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
     // default skills
-    skills.append(skillsInfo.SkillId.Heart) catch h.oom();
+    // skills.append(skillsInfo.SkillId.Heart) catch h.oom();
+    skills.append(skillsInfo.SkillId.Shield) catch h.oom();
     const upgrades = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
 
     return Self{
         .entity = entity,
         .heart_projectile = HeartProjectile.init(entity.position_center),
         .sparkles = Sparkles.init(entity.position_center),
+        .shield_skill = Shield.init(entity.position_center),
         .meteors = meteors,
         .exp = 0,
         .lvl = 1,
