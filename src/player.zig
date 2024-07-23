@@ -24,6 +24,8 @@ const Self = @This();
 entity: Entity,
 exp: f32,
 lvl: u32,
+hp_bar: Progressbar,
+// TODO: move to sep. module
 exp_progressbar: Progressbar,
 exp_needed_for_lvl: f32 = 5,
 
@@ -37,7 +39,7 @@ shield_skill: Shield,
 
 const DEFAULT_SKILLS_ARRAY_CAP = 100;
 // const START_HEALTH = 40;
-const START_HEALTH = 400000;
+const START_HEALTH = 200;
 
 pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
     var dmg_sum: f32 = 0;
@@ -132,6 +134,12 @@ pub fn update(self: *Self) void {
 
     self.entity.update(pos_delta);
     self.update_skills();
+    self.update_hp_bar();
+}
+
+fn update_hp_bar(self: *Self) void {
+    self.hp_bar.fill_color = if (self.entity.shield > 0) rl.BLUE else rl.GREEN;
+    self.hp_bar.transform = calc_hp_bar_transform(self.entity.position_center);
 }
 
 fn update_skills(self: *Self) void {
@@ -158,6 +166,13 @@ pub fn draw_skills(self: *const Self) void {
 
 pub fn draw(self: *const Self) void {
     self.entity.draw(rl.BLUE);
+    self.draw_hp_bar();
+}
+
+fn draw_hp_bar(self: *const Self) void {
+    const hp_f: f32 = @floatFromInt(self.entity.health);
+    const start_hp_f: f32 = @floatFromInt(START_HEALTH);
+    self.hp_bar.draw(hp_f, start_hp_f);
 }
 
 pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
@@ -178,7 +193,8 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
         .meteors = meteors,
         .exp = 0,
         .lvl = 1,
-        .exp_progressbar = init_progress_bar(),
+        .exp_progressbar = init_exp_bar(),
+        .hp_bar = init_hp_bar(entity.position_center),
         .active_skills = skills,
         .active_upgrades = upgrades,
     };
@@ -196,7 +212,21 @@ pub fn draw_exp_progress(self: *const Self) void {
     self.exp_progressbar.draw(self.exp, self.exp_needed_for_lvl);
 }
 
-fn init_progress_bar() Progressbar {
+fn calc_hp_bar_transform(player_center: rl.Vector2) rl.Rectangle {
+    var pos = player_center;
+    pos.y -= 40;
+    return rutils.new_rect_with_center_pos(pos, 70, 12);
+}
+
+fn init_hp_bar(player_center: rl.Vector2) Progressbar {
+    return Progressbar{
+        .transform = calc_hp_bar_transform(player_center),
+        .background_color = rl.GRAY,
+        .fill_color = rl.GREEN,
+    };
+}
+
+fn init_exp_bar() Progressbar {
     var transform = rutils.new_rect_at_top(screen.remx(60), screen.remy(4));
     transform.y += screen.remy(2);
 
