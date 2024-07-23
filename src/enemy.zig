@@ -12,9 +12,9 @@ const Self = @This();
 
 entity: Entity,
 
-const DMG = 10;
-// const HEALTH = 40;
-const HEALTH = 5;
+const DMG = 2;
+const HEALTH = 40;
+// const HEALTH = 5;
 
 pub fn init(pos: rl.Vector2) Self {
     var entity = Entity.init(pos, 50, HEALTH, rl.GREEN);

@@ -7,17 +7,20 @@ const debug_info = @import("debug_info.zig");
 
 const Text = @import("gui/text.zig");
 const Progressbar = @import("gui/progressbar.zig");
+const Entity = @import("entity.zig");
+const Background = @import("background.zig");
+
 const fonts = @import("gui/fonts.zig");
+const screen = @import("screen.zig");
+const player_lvlup_ui = @import("player_lvlup_ui.zig");
+const skillsInfo = @import("player_skills_info.zig");
+
+// skills
 const HeartProjectile = @import("player_skills/heart_projectile.zig");
 const Meteors = @import("player_skills/meteors.zig");
 const Sparkles = @import("player_skills/sparkles.zig");
 const Shield = @import("player_skills/shield.zig");
-const Entity = @import("entity.zig");
-const Background = @import("background.zig");
-
-const screen = @import("screen.zig");
-const player_lvlup_ui = @import("player_lvlup_ui.zig");
-const skillsInfo = @import("player_skills_info.zig");
+const Knight = @import("player_skills/knight.zig");
 
 const Self = @This();
 
@@ -35,6 +38,7 @@ active_upgrades: std.ArrayList(skillsInfo.UpgradeId),
 heart_projectile: HeartProjectile,
 meteors: Meteors,
 sparkles: Sparkles,
+knight: Knight,
 shield_skill: Shield,
 
 const DEFAULT_SKILLS_ARRAY_CAP = 100;
@@ -47,7 +51,7 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
 
     var skills = std.ArrayList(skillsInfo.SkillId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
     // default skills
-    skills.append(skillsInfo.SkillId.Heart) catch h.oom();
+    skills.append(.Heart) catch h.oom();
     const upgrades = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
 
     return Self{
@@ -55,6 +59,7 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
         .heart_projectile = HeartProjectile.init(entity.position_center),
         .sparkles = Sparkles.init(entity.position_center),
         .shield_skill = Shield.init(entity.position_center),
+        .knight = Knight.init(entity.position_center),
         .meteors = meteors,
         .exp = 0,
         .lvl = 1,
@@ -72,6 +77,7 @@ pub fn deinit(self: *Self) void {
     self.active_skills.deinit();
     self.active_upgrades.deinit();
     self.shield_skill.deinit();
+    self.knight.deinit();
 }
 
 pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
@@ -79,8 +85,14 @@ pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
 
     for (self.active_skills.items) |skill_id| {
         switch (skill_id) {
-            // TODO: is shield special case ?
+            // TODO:  special cases ?
             .Shield => {},
+
+            .Knight => {
+                if (rl.CheckCollisionRecs(enemy_entity.collider, self.knight.collider)) {
+                    dmg_sum += self.knight.dmg;
+                }
+            },
             .Heart => {
                 if (rl.CheckCollisionRecs(enemy_entity.collider, self.heart_projectile.collider)) {
                     dmg_sum += self.heart_projectile.dmg;
@@ -128,19 +140,26 @@ pub fn add_upgrade(self: *Self, id: skillsInfo.UpgradeId) void {
     self.active_upgrades.append(id) catch h.oom();
 
     switch (id) {
+        .KnightStronger => self.knight.dmg *= 1.1,
+        .KnightFasterRotation => self.knight.rotation_timeout *= 0.9,
+        .KnightBigger => self.knight.size *= 1.1,
+
         .HeartRange => self.heart_projectile.offset_from_center *= 1.1,
+        .HeartFaster => self.heart_projectile.speed *= 1.1,
+        .HeartStronger => self.heart_projectile.dmg *= 1.1,
+
         .ShieldEndurence => {
             self.entity.health += 1;
             self.entity.max_health += 1;
         },
         .ShieldFasterRestore => self.shield_skill.restore_timeout *= 0.9,
+
         .SparklesBigger => self.sparkles.size *= 1.3,
-        .HeartFaster => self.heart_projectile.speed *= 1.1,
-        .HeartStronger => self.heart_projectile.dmg *= 1.1,
-        .MeteorsFasterSpawn => self.meteors.spawn_timeout *= 0.9,
-        .MeteorsStronger => self.meteors.dmg *= 1.1,
         .SparklesFasterSpawn => self.sparkles.fire_timeout *= 0.9,
         .SparklesStronger => self.sparkles.dmg *= 1.1,
+
+        .MeteorsFasterSpawn => self.meteors.spawn_timeout *= 0.9,
+        .MeteorsStronger => self.meteors.dmg *= 1.1,
     }
 }
 
@@ -188,6 +207,7 @@ fn update_skills(self: *Self) void {
             .Heart => self.heart_projectile.update(self.entity.position_center),
             .Meteors => self.meteors.update(self.entity.position_center),
             .Sparkles => self.sparkles.update(self.entity.position_center),
+            .Knight => self.knight.update(self.entity.position_center),
         }
     }
 }
@@ -199,6 +219,7 @@ pub fn draw_skills(self: *const Self) void {
             .Heart => self.heart_projectile.draw(),
             .Meteors => self.meteors.draw(),
             .Sparkles => self.sparkles.draw(),
+            .Knight => self.knight.draw(),
         }
     }
 }

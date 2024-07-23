@@ -11,10 +11,10 @@ transform: rl.Rectangle,
 collider: rl.Rectangle,
 angle: f32,
 dmg: f32 = 10,
-speed: f32 = 150,
+speed: f32 = 250,
 offset_from_center: f32 = DEFAULT_OFFSET_FROM_CENTER,
 
-const DEFAULT_OFFSET_FROM_CENTER: comptime_float = 100;
+const DEFAULT_OFFSET_FROM_CENTER: comptime_float = 150;
 const SIZE: f32 = 40;
 const INIT_ANGLE: comptime_float = 270;
 

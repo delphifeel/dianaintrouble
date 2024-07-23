@@ -17,13 +17,12 @@ list: std.ArrayList(Enemy),
 time_passed: f32,
 
 // DEBUG
-var maxEnemiesPerRespawn: i32 = 100;
 // const START_ENEMIES_COUNT: f32 = 400;
 // const RESPAWN_COUNT_INC = 100;
 
-// var maxEnemiesPerRespawn: i32 = 0;
-const START_ENEMIES_COUNT: f32 = 4;
-const RESPAWN_COUNT_INC = 4;
+var maxEnemiesPerRespawn: i32 = START_ENEMIES_COUNT;
+const START_ENEMIES_COUNT: f32 = 40;
+const RESPAWN_COUNT_INC = 1;
 const MIN_OFFSET: f32 = 700;
 const MAX_OFFSET: f32 = 900;
 const SPAWN_EVERY: f32 = 10;

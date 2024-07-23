@@ -13,7 +13,7 @@ list: std.ArrayList(Meteor),
 dmg: f32 = 40,
 spawn_timeout: f32 = 3,
 
-const MAX_METEORS = 30;
+const MAX_METEORS = 100;
 
 pub fn update(self: *Self, player_pos: rl.Vector2) void {
     const frame_time = rl.GetFrameTime();

@@ -20,9 +20,10 @@ time_passed: f32 = 0,
 rotation: f32 = 0,
 
 const SIZE: f32 = 40;
-const MIN_OFFSET_FROM_CENTER: i32 = 300;
-const MAX_OFFSET_FROM_CENTER: i32 = 700;
+const MIN_OFFSET_FROM_CENTER: i32 = 100;
+const MAX_OFFSET_FROM_CENTER: i32 = 300;
 const EXPLOSION_TIME: f32 = 1;
+const EXPLOSION_SCALE: comptime_float = 6;
 
 pub fn deinit(_: *Self) void {}
 
@@ -55,7 +56,7 @@ fn animate_explosion(self: *Self, last_frame_time: f32) void {
         const delta = rutils.distance_per_frame(100, last_frame_time);
         self.transform = rutils.grow_rect_from_center(self.transform, -delta, -delta);
     } else {
-        self.transform = rutils.grow_rect_from_center(self.transform, self.transform.width * 3, self.transform.height * 3);
+        self.transform = rutils.grow_rect_from_center(self.transform, self.transform.width * EXPLOSION_SCALE, self.transform.height * EXPLOSION_SCALE);
         self.explosion_collider = self.transform;
         self.is_exploded = true;
     }

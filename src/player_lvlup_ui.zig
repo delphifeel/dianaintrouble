@@ -67,7 +67,7 @@ pub fn deinit() void {
 }
 
 pub fn show(lvl: u32) void {
-    if ((lvl == 2) or (lvl % 8 == 0)) {
+    if ((lvl == 2) or (lvl == 4) or (lvl % 8 == 0)) {
         if (skills_pool.items.len == 0) {
             return;
         }
