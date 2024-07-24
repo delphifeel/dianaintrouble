@@ -21,6 +21,7 @@ const Meteors = @import("player_skills/meteors.zig");
 const Sparkles = @import("player_skills/sparkles.zig");
 const Shield = @import("player_skills/shield.zig");
 const Knight = @import("player_skills/knight.zig");
+const Moon = @import("player_skills/moon.zig");
 
 const Self = @This();
 
@@ -36,6 +37,7 @@ exp_needed_for_lvl: f32 = 4,
 active_skills: std.ArrayList(skillsInfo.SkillId),
 active_upgrades: std.ArrayList(skillsInfo.UpgradeId),
 heart_projectile: HeartProjectile,
+moon: Moon,
 meteors: Meteors,
 sparkles: Sparkles,
 knight: Knight,
@@ -51,7 +53,8 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
 
     var skills = std.ArrayList(skillsInfo.SkillId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
     // default skills
-    skills.append(.Heart) catch h.oom();
+    // skills.append(.Heart) catch h.oom();
+    skills.append(.Moon) catch h.oom();
     const upgrades = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
 
     return Self{
@@ -60,6 +63,7 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
         .sparkles = Sparkles.init(entity.position_center),
         .shield_skill = Shield.init(entity.position_center),
         .knight = Knight.init(entity.position_center),
+        .moon = Moon.init(entity.position_center),
         .meteors = meteors,
         .exp = 0,
         .lvl = 1,
@@ -78,6 +82,7 @@ pub fn deinit(self: *Self) void {
     self.active_upgrades.deinit();
     self.shield_skill.deinit();
     self.knight.deinit();
+    self.moon.deinit();
 }
 
 pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
@@ -87,6 +92,12 @@ pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
         switch (skill_id) {
             // TODO:  special cases ?
             .Shield => {},
+
+            .Moon => {
+                if (self.moon.is_collides(enemy_entity.collider)) {
+                    dmg_sum += self.moon.dmg;
+                }
+            },
 
             .Knight => {
                 if (rl.CheckCollisionRecs(enemy_entity.collider, self.knight.collider)) {
@@ -140,6 +151,9 @@ pub fn add_upgrade(self: *Self, id: skillsInfo.UpgradeId) void {
     self.active_upgrades.append(id) catch h.oom();
 
     switch (id) {
+        .MoonRange => self.moon.radius *= 1.1,
+        .MoonStronger => self.moon.dmg *= 1.1,
+
         .KnightStronger => self.knight.dmg *= 1.1,
         .KnightFasterRotation => self.knight.rotation_timeout *= 0.9,
         .KnightBigger => self.knight.size *= 1.1,
@@ -203,6 +217,7 @@ fn update_hp_bar(self: *Self) void {
 fn update_skills(self: *Self) void {
     for (self.active_skills.items) |skill_id| {
         switch (skill_id) {
+            .Moon => self.moon.update(self.entity.position_center),
             .Shield => self.shield_skill.update(self),
             .Heart => self.heart_projectile.update(self.entity.position_center),
             .Meteors => self.meteors.update(self.entity.position_center),
@@ -215,6 +230,7 @@ fn update_skills(self: *Self) void {
 pub fn draw_skills(self: *const Self) void {
     for (self.active_skills.items) |skill_id| {
         switch (skill_id) {
+            .Moon => self.moon.draw(),
             .Shield => self.shield_skill.draw(),
             .Heart => self.heart_projectile.draw(),
             .Meteors => self.meteors.draw(),

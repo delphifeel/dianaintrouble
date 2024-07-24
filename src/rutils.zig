@@ -228,28 +228,3 @@ pub inline fn rand_f(min: f32, max: f32) f32 {
 // 	rect.Height -= top + bottom
 // 	return rect
 // }
-
-test "rand value" {
-    const max = 500;
-    const min = 300;
-    const init_pos = new_vector2(0, 0);
-    var v_f: f32 = -0.01;
-
-    var v = (max - min) * v_f;
-    var new_x = init_pos.x;
-    if (v < 0) {
-        new_x += -min + v;
-    } else {
-        new_x += min + v;
-    }
-    v_f = 0.5;
-    v = (max - min) * v_f;
-    var new_y = init_pos.y;
-    if (v < 0) {
-        new_y += -min + v;
-    } else {
-        new_y += min + v;
-    }
-
-    std.debug.print("{d}:{d}", .{ new_x, new_y });
-}

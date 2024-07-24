@@ -13,6 +13,7 @@ pub const SkillId = enum {
     Sparkles,
     Shield,
     Knight,
+    Moon,
 };
 
 // TODO: we need max values (speed, dmg etc) for upgrades
@@ -34,6 +35,9 @@ pub const UpgradeId = enum {
 
     ShieldEndurence,
     ShieldFasterRestore,
+
+    MoonRange,
+    MoonStronger,
 };
 
 pub const Skill = struct {
@@ -66,6 +70,23 @@ pub fn find_upgrade_by_id(id: UpgradeId) ?Upgrade {
 }
 
 const all_skills = std.ComptimeStringMap(Skill, .{
+    .{ @tagName(.Moon), .{
+        .id = .Moon,
+        .name = "Moon",
+        .description = "Moon",
+        .upgrades = &.{
+            .{
+                .id = .MoonRange,
+                .name = "MoonRange",
+                .description = "MoonRange",
+            },
+            .{
+                .id = .MoonStronger,
+                .name = "MoonStronger",
+                .description = "MoonStronger",
+            },
+        },
+    } },
     .{ @tagName(.Knight), .{
         .id = .Knight,
         .name = "Knight",
