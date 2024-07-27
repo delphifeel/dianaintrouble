@@ -46,5 +46,5 @@ pub fn update(self: *Self, player_entity: *Entity) void {
 }
 
 pub fn draw(self: *const Self) void {
-    self.entity.draw(rl.ORANGE);
+    self.entity.draw();
 }

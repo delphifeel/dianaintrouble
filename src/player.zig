@@ -242,7 +242,7 @@ pub fn draw_skills(self: *const Self) void {
 }
 
 pub fn draw(self: *const Self) void {
-    self.entity.draw(rl.BLUE);
+    self.entity.draw();
     self.draw_hp_bar();
 }
 
