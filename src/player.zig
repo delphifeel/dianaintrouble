@@ -9,6 +9,7 @@ const Text = @import("gui/text.zig");
 const Progressbar = @import("gui/progressbar.zig");
 const Entity = @import("entity.zig");
 const Background = @import("background.zig");
+const Animation = @import("animation.zig");
 
 const fonts = @import("gui/fonts.zig");
 const screen = @import("screen.zig");
@@ -26,12 +27,17 @@ const Moon = @import("player_skills/moon.zig");
 const Self = @This();
 
 entity: Entity,
+run_animation: Animation,
+idle_animation: Animation,
 exp: f32,
 lvl: u32,
 hp_bar: Progressbar,
 // TODO: move to sep. module
 exp_progressbar: Progressbar,
-exp_needed_for_lvl: f32 = 4,
+
+transform: rl.Rectangle = undefined,
+is_moving: bool = false,
+exp_needed_for_lvl: f32 = 10,
 
 // skills
 active_skills: std.ArrayList(skillsInfo.SkillId),
@@ -44,9 +50,12 @@ knight: Knight,
 shield_skill: Shield,
 
 const DEFAULT_SKILLS_ARRAY_CAP = 100;
+// const START_HEALTH = 200;
 const START_HEALTH = 40;
 const MOVE_SPEED: comptime_float = 200;
-// const START_HEALTH = 200;
+
+const ANIMATION_SPEED: comptime_float = 0.1;
+const SPRITE_DEST_SIZE: comptime_float = 200;
 
 pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
     const entity = Entity.init(pos, START_HEALTH, rl.RED);
@@ -58,7 +67,19 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
     // skills.append(.Moon) catch h.oom();
     const upgrades = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
 
+    const texture_run = rl.LoadTexture("assets/character_run.png");
+    const texture_idle = rl.LoadTexture("assets/character_idle.png");
     return Self{
+        .run_animation = .{
+            .texture = texture_run,
+            .speed = ANIMATION_SPEED,
+            .sprites_count = 8,
+        },
+        .idle_animation = .{
+            .texture = texture_idle,
+            .speed = ANIMATION_SPEED,
+            .sprites_count = 8,
+        },
         .entity = entity,
         .heart_projectile = HeartProjectile.init(entity.position_center),
         .sparkles = Sparkles.init(entity.position_center),
@@ -84,6 +105,9 @@ pub fn deinit(self: *Self) void {
     self.shield_skill.deinit();
     self.knight.deinit();
     self.moon.deinit();
+
+    rl.UnloadTexture(self.run_animation.texture);
+    rl.UnloadTexture(self.idle_animation.texture);
 }
 
 pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
@@ -144,6 +168,7 @@ pub fn has_active_skill(self: *const Self, id: skillsInfo.SkillId) bool {
     return false;
 }
 
+// TODO: skills should init here - look sparkles example bug
 pub fn add_skill(self: *Self, id: skillsInfo.SkillId) void {
     self.active_skills.append(id) catch h.oom();
 }
@@ -206,6 +231,33 @@ pub fn update(self: *Self) void {
     }
 
     self.entity.update(pos_delta);
+
+    if (pos_delta.x < 0) {
+        self.idle_animation.is_flip = true;
+        self.run_animation.is_flip = true;
+    } else if (pos_delta.x > 0) {
+        self.idle_animation.is_flip = false;
+        self.run_animation.is_flip = false;
+    }
+    self.transform = rutils.new_rect_with_center_pos(self.entity.position_center, SPRITE_DEST_SIZE, SPRITE_DEST_SIZE);
+    const prev_is_moving = self.is_moving;
+    if ((pos_delta.x == 0) and (pos_delta.y == 0)) {
+        self.is_moving = false;
+    } else {
+        self.is_moving = true;
+    }
+
+    if (prev_is_moving != self.is_moving) {
+        self.run_animation.reset();
+        self.idle_animation.reset();
+    }
+
+    if (self.is_moving) {
+        self.run_animation.update();
+    } else {
+        self.idle_animation.update();
+    }
+
     self.update_skills();
     self.update_hp_bar();
 }
@@ -243,6 +295,11 @@ pub fn draw_skills(self: *const Self) void {
 
 pub fn draw(self: *const Self) void {
     self.entity.draw();
+    if (self.is_moving) {
+        self.run_animation.draw(self.transform, self.entity.sprite_tint_color);
+    } else {
+        self.idle_animation.draw(self.transform, self.entity.sprite_tint_color);
+    }
     self.draw_hp_bar();
 }
 

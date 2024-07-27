@@ -20,8 +20,8 @@ time_passed: f32 = 0,
 rotation: f32 = 0,
 
 const SIZE: f32 = 40;
-const MIN_OFFSET_FROM_CENTER: i32 = 100;
-const MAX_OFFSET_FROM_CENTER: i32 = 300;
+const MIN_OFFSET_FROM_CENTER: i32 = 50;
+const MAX_OFFSET_FROM_CENTER: i32 = 150;
 const EXPLOSION_TIME: f32 = 1;
 const EXPLOSION_SCALE: comptime_float = 6;
 

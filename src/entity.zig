@@ -10,19 +10,18 @@ const debug_info = @import("debug_info.zig");
 const Text = @import("gui/text.zig");
 const fonts = @import("gui/fonts.zig");
 const Background = @import("background.zig");
-const Animation = @import("animation.zig");
 
 const Self = @This();
 
-run_animation: Animation,
 collider: rl.Rectangle,
 // TODO: remove it after  coords system ?
 position_center: rl.Vector2,
 health: i32,
 max_health: i32,
 
+// TODO: move outside ?
 sprite_tint_color: rl.Color = rl.WHITE,
-
+is_flip: bool = false,
 shield: i32 = 0,
 is_dead: bool = false,
 is_invurnable: bool = false,
@@ -35,25 +34,14 @@ hit_text_x_offset: f32 = 0,
 const HIT_TIMEOUT: comptime_float = 0.4;
 const HIT_TEXT_SPEED: comptime_float = 200;
 
-const ANIMATION_SPEED: comptime_float = 0.1;
-const SPRITE_SRC_SIZE: comptime_float = 64;
-const SPRITE_DEST_SIZE: comptime_float = 200;
-
 const COLLIDER_WIDTH: comptime_float = 40;
 const COLLIDER_HEIGHT: comptime_float = 80;
 
 pub fn init(center_pos: rl.Vector2, start_health: i32, hit_color: rl.Color) Self {
-    const texture = rl.LoadTexture("assets/character_run.png");
     var collider = rutils.new_rect_with_center_pos(center_pos, COLLIDER_WIDTH, COLLIDER_HEIGHT);
     collider = rutils.find_nearest_rect_inside_world(collider);
-
     const position_center = rutils.calc_rect_center(collider);
     return Self{
-        .run_animation = .{
-            .texture = texture,
-            .speed = ANIMATION_SPEED,
-            .sprites_count = 8,
-        },
         .position_center = position_center,
         .collider = collider,
         .health = start_health,
@@ -62,9 +50,7 @@ pub fn init(center_pos: rl.Vector2, start_health: i32, hit_color: rl.Color) Self
     };
 }
 
-pub fn deinit(self: *Self) void {
-    rl.UnloadTexture(self.run_animation.texture);
-}
+pub fn deinit(_: *Self) void {}
 
 pub fn update(self: *Self, move_offset: rl.Vector2) void {
     const frame_time = rl.GetFrameTime();
@@ -75,20 +61,12 @@ pub fn update(self: *Self, move_offset: rl.Vector2) void {
             new_move_offset.x *= 0.7;
             new_move_offset.y *= 0.7;
         }
-        if (new_move_offset.x < 0) {
-            self.run_animation.set_flip(true);
-        } else if (new_move_offset.x > 0) {
-            self.run_animation.set_flip(false);
-        }
 
         const new_collider = rutils.move_rect(self.collider, move_offset);
         if (!rutils.is_rect_out_of_rect(new_collider, Background.transform)) {
             self.collider = new_collider;
             self.position_center = rutils.calc_rect_center(self.collider);
         } else {}
-
-        const anim_transform = rutils.new_rect_with_center_pos(self.position_center, SPRITE_DEST_SIZE, SPRITE_DEST_SIZE);
-        self.run_animation.update(anim_transform);
     }
 
     if (self.is_invurnable) {
@@ -110,9 +88,7 @@ pub fn update(self: *Self, move_offset: rl.Vector2) void {
     }
 }
 
-pub fn draw(self: *const Self) void {
-    self.run_animation.draw(self.sprite_tint_color);
-}
+pub fn draw(_: *const Self) void {}
 
 // hit with timeout
 pub fn try_hit(self: *Self, dmg: f32) void {
