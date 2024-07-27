@@ -28,6 +28,7 @@ const MAX_OFFSET: f32 = 900;
 const SPAWN_EVERY: f32 = 10;
 
 pub fn spawn(allocator: std.mem.Allocator, player_center: rl.Vector2) Enemies {
+    // TODO: make no allocations
     var enemies = std.ArrayList(Enemy).initCapacity(allocator, START_ENEMIES_COUNT * 10) catch h.oom();
     var i: i32 = 0;
     while (i < START_ENEMIES_COUNT) {

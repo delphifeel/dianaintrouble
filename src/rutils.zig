@@ -6,6 +6,11 @@ const Background = @import("background.zig");
 
 pub const TARGET_FPS = 120;
 
+// TODO: move to collider module
+pub fn draw_collider(collider: rl.Rectangle) void {
+    rl.DrawRectangleLinesEx(collider, 2, rl.PURPLE);
+}
+
 pub fn rotate_vector2(center: rl.Vector2, radius: f32, angle_deg: f32) rl.Vector2 {
     const angle_rad = std.math.degreesToRadians(f32, angle_deg);
     const x = center.x + radius * std.math.cos(angle_rad);

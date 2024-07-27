@@ -14,6 +14,7 @@ entity: Entity,
 
 const DMG = 2;
 const HEALTH = 40;
+const MOVE_SPEED = 50;
 // const HEALTH = 5;
 
 pub fn init(pos: rl.Vector2) Self {
@@ -29,7 +30,7 @@ pub fn deinit(self: *Self) void {
 
 pub fn update(self: *Self, player_entity: *Entity) void {
     const delta = rl.GetFrameTime();
-    const step = rutils.px_per_sec(50, delta);
+    const step = rutils.px_per_sec(MOVE_SPEED, delta);
     const self_center = self.entity.position_center;
     const diff = rm.Vector2Subtract(player_entity.position_center, self_center);
     const step_vec = rm.Vector2Normalize(diff);
