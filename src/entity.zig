@@ -33,7 +33,7 @@ is_invurnable: bool = false,
 hit_color: rl.Color,
 hit_time_passed: f32 = 0,
 hit_pos: rl.Vector2 = undefined,
-hit_text: [8]u8 = undefined,
+hit_text: [16]u8 = undefined,
 hit_text_x_offset: f32 = 0,
 
 const HIT_TIMEOUT: comptime_float = 0.4;
@@ -128,7 +128,6 @@ pub fn update(self: *Self, move_offset: rl.Vector2) void {
 
 pub fn draw(self: *const Self, _: rl.Color) void {
     rl.DrawTexturePro(self.texture, self.sprite_src_rect, self.sprite_dest_rect, rm.Vector2Zero(), 0, self.sprite_tint_color);
-    // rl.DrawRectangleLinesEx(self.collider, 2, rl.PURPLE);
 }
 
 // hit with timeout
@@ -157,9 +156,7 @@ fn hit(self: *Self, dmg: f32) void {
     self.is_invurnable = true;
     self.hit_time_passed = 0;
     self.hit_pos = rutils.new_vector2(self.collider.x + self.collider.width + 10, self.collider.y - 15);
-    _ = std.fmt.bufPrintZ(&self.hit_text, "{d}", .{dmg_i}) catch {
-        unreachable;
-    };
+    _ = std.fmt.bufPrintZ(&self.hit_text, "{d}", .{dmg_i}) catch unreachable;
 
     if (self.health <= 0) {
         self.is_dead = true;
