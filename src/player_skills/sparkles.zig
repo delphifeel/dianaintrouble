@@ -56,7 +56,7 @@ pub fn update(self: *Self, player_center: rl.Vector2) void {
         self.reset(player_center);
     }
 
-    const distance = rutils.distance_per_frame(self.speed, frame_time);
+    const distance = rutils.px_per_sec(self.speed, frame_time);
 
     self.move_sparkle(0, rutils.new_vector2(-distance, -distance));
     self.move_sparkle(1, rutils.new_vector2(distance, -distance));

@@ -80,7 +80,7 @@ pub fn print_vec2(vec: rl.Vector2) void {
     std.debug.print("x: {d}, y: {d}\n", .{ vec.x, vec.y });
 }
 
-pub inline fn distance_per_frame(speed: f32, last_frame_time: f32) f32 {
+pub inline fn px_per_sec(speed: f32, last_frame_time: f32) f32 {
     return speed * last_frame_time;
 }
 

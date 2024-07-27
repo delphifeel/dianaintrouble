@@ -249,7 +249,7 @@ pub const struct_Ray = extern struct {
 pub const Ray = struct_Ray;
 pub const struct_RayCollision = extern struct {
     hit: bool = @import("std").mem.zeroes(bool),
-    distance_per_frame: f32 = @import("std").mem.zeroes(f32),
+    px_per_sec: f32 = @import("std").mem.zeroes(f32),
     point: Vector3 = @import("std").mem.zeroes(Vector3),
     normal: Vector3 = @import("std").mem.zeroes(Vector3),
 };

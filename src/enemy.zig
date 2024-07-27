@@ -17,7 +17,7 @@ const HEALTH = 40;
 // const HEALTH = 5;
 
 pub fn init(pos: rl.Vector2) Self {
-    var entity = Entity.init(pos, 50, HEALTH, rl.GREEN);
+    var entity = Entity.init(pos, HEALTH, rl.GREEN);
     return Self{
         .entity = entity,
     };
@@ -29,7 +29,7 @@ pub fn deinit(self: *Self) void {
 
 pub fn update(self: *Self, player_entity: *Entity) void {
     const delta = rl.GetFrameTime();
-    const step = rutils.distance_per_frame(50, delta);
+    const step = rutils.px_per_sec(50, delta);
     const self_center = self.entity.position_center;
     const diff = rm.Vector2Subtract(player_entity.position_center, self_center);
     const step_vec = rm.Vector2Normalize(diff);

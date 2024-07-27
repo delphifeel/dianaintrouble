@@ -45,16 +45,17 @@ shield_skill: Shield,
 
 const DEFAULT_SKILLS_ARRAY_CAP = 100;
 const START_HEALTH = 40;
+const MOVE_SPEED: comptime_float = 200;
 // const START_HEALTH = 200;
 
 pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
-    const entity = Entity.init(pos, 60, START_HEALTH, rl.RED);
+    const entity = Entity.init(pos, START_HEALTH, rl.RED);
     var meteors = Meteors.init(allocator);
 
     var skills = std.ArrayList(skillsInfo.SkillId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
     // default skills
-    // skills.append(.Heart) catch h.oom();
-    skills.append(.Moon) catch h.oom();
+    skills.append(.Heart) catch h.oom();
+    // skills.append(.Moon) catch h.oom();
     const upgrades = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
 
     return Self{
@@ -189,7 +190,7 @@ fn up_exp(self: *Self) void {
 
 pub fn update(self: *Self) void {
     const frame_time = rl.GetFrameTime();
-    const step = rutils.distance_per_frame(80, frame_time);
+    const step = rutils.px_per_sec(MOVE_SPEED, frame_time);
     var pos_delta = rm.Vector2Zero();
     if (rl.IsKeyDown(rl.KEY_A)) {
         pos_delta.x -= step;
@@ -261,7 +262,7 @@ fn init_hp_bar(player_center: rl.Vector2) Progressbar {
 
 fn calc_hp_bar_transform(player_center: rl.Vector2) rl.Rectangle {
     var pos = player_center;
-    pos.y -= 40;
+    pos.y -= 80;
     return rutils.new_rect_with_center_pos(pos, 70, 12);
 }
 

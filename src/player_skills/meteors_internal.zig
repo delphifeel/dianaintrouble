@@ -45,15 +45,15 @@ pub fn respawn(self: *Self, player_center: rl.Vector2) void {
 }
 
 fn animate_falling(self: *Self, last_frame_time: f32) void {
-    self.rotation += rutils.distance_per_frame(300, last_frame_time);
-    self.transform.y += rutils.distance_per_frame(600, last_frame_time);
+    self.rotation += rutils.px_per_sec(300, last_frame_time);
+    self.transform.y += rutils.px_per_sec(600, last_frame_time);
 }
 
 fn animate_explosion(self: *Self, last_frame_time: f32) void {
     if (self.is_exploded) {
         self.explosion_collider = null;
-        self.explosion_color_alpha -= rutils.distance_per_frame(1, last_frame_time);
-        const delta = rutils.distance_per_frame(100, last_frame_time);
+        self.explosion_color_alpha -= rutils.px_per_sec(1, last_frame_time);
+        const delta = rutils.px_per_sec(100, last_frame_time);
         self.transform = rutils.grow_rect_from_center(self.transform, -delta, -delta);
     } else {
         self.transform = rutils.grow_rect_from_center(self.transform, self.transform.width * EXPLOSION_SCALE, self.transform.height * EXPLOSION_SCALE);

@@ -29,7 +29,7 @@ pub fn init(player_center: rl.Vector2) Self {
 }
 
 pub fn update(self: *Self, player_center: rl.Vector2) void {
-    self.angle += rutils.distance_per_frame(self.speed, rl.GetFrameTime());
+    self.angle += rutils.px_per_sec(self.speed, rl.GetFrameTime());
     if (self.angle >= 360) {
         self.angle = 360 - self.angle;
     }
