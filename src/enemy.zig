@@ -31,7 +31,7 @@ pub fn init(pos: rl.Vector2) Self {
         .walk_animation = .{
             .texture = texture,
             .speed = ANIMATION_SPEED,
-            .sprites_count = 8,
+            .sprite_width = 64,
         },
     };
 }

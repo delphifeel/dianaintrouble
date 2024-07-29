@@ -73,12 +73,12 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
         .run_animation = .{
             .texture = texture_run,
             .speed = ANIMATION_SPEED,
-            .sprites_count = 8,
+            .sprite_width = 64,
         },
         .idle_animation = .{
             .texture = texture_idle,
             .speed = ANIMATION_SPEED,
-            .sprites_count = 8,
+            .sprite_width = 64,
         },
         .entity = entity,
         .heart_projectile = HeartProjectile.init(entity.position_center),
