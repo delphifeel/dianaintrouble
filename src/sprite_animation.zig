@@ -49,3 +49,14 @@ pub fn update(self: *Self) void {
 pub fn draw(self: *const Self, dest_transform: rl.Rectangle, tint_color: rl.Color) void {
     rl.DrawTexturePro(self.texture, self.sprite_src_rect, dest_transform, rm.Vector2Zero(), 0, tint_color);
 }
+
+pub fn draw_rotation(self: *const Self, dest_transform: rl.Rectangle, tint_color: rl.Color, rotation: f32) void {
+    rl.DrawTexturePro(
+        self.texture,
+        self.sprite_src_rect,
+        dest_transform,
+        rutils.new_vector2(dest_transform.width / 2, dest_transform.height / 2),
+        rotation,
+        tint_color,
+    );
+}

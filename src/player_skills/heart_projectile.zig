@@ -4,12 +4,15 @@ const rm = @import("../raymath.zig");
 const rutils = @import("../rutils.zig");
 
 const Player = @import("../player.zig");
+const SpriteAnimation = @import("../sprite_animation.zig");
 
 const Self = @This();
 
+animation: SpriteAnimation,
 transform: rl.Rectangle,
 collider: rl.Rectangle,
 angle: f32,
+
 dmg: f32 = 10,
 speed: f32 = 250,
 offset_from_center: f32 = DEFAULT_OFFSET_FROM_CENTER,
@@ -25,7 +28,16 @@ pub fn init(player_center: rl.Vector2) Self {
         .transform = transform,
         .collider = transform,
         .angle = INIT_ANGLE,
+        .animation = .{
+            .texture = rl.LoadTexture("assets/heart.png"),
+            .speed = 0.1,
+            .sprite_width = 32,
+        },
     };
+}
+
+pub fn deinit(self: *Self) void {
+    rl.UnloadTexture(self.animation.texture);
 }
 
 pub fn update(self: *Self, player_center: rl.Vector2) void {
@@ -36,8 +48,10 @@ pub fn update(self: *Self, player_center: rl.Vector2) void {
     const new_pos = rutils.rotate_vector2(player_center, self.offset_from_center, self.angle);
     self.transform = rutils.new_rect_with_center_pos(new_pos, SIZE, SIZE);
     self.collider = self.transform;
+
+    self.animation.update();
 }
 
 pub fn draw(self: *const Self) void {
-    rl.DrawRectangleRec(self.transform, rl.PINK);
+    self.animation.draw(self.transform, rl.WHITE);
 }

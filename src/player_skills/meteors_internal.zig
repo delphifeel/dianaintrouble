@@ -5,8 +5,11 @@ const rutils = @import("../rutils.zig");
 
 const Player = @import("../player.zig");
 const Background = @import("../background.zig");
+const SpriteAnimation = @import("../sprite_animation.zig");
 
 const Self = @This();
+
+falling_animation: SpriteAnimation,
 
 is_falling: bool = false,
 is_explosion: bool = false,
@@ -19,13 +22,11 @@ explosion_collider: ?rl.Rectangle = null,
 time_passed: f32 = 0,
 rotation: f32 = 0,
 
-const SIZE: f32 = 40;
+const SIZE: comptime_float = 120;
 const MIN_OFFSET_FROM_CENTER: i32 = 50;
 const MAX_OFFSET_FROM_CENTER: i32 = 150;
 const EXPLOSION_TIME: f32 = 1;
-const EXPLOSION_SCALE: comptime_float = 6;
-
-pub fn deinit(_: *Self) void {}
+const EXPLOSION_SIZE: comptime_float = 400;
 
 pub fn respawn(self: *Self, player_center: rl.Vector2) void {
     var final_pos = rutils.rand_coord_in_range(player_center, MIN_OFFSET_FROM_CENTER, MAX_OFFSET_FROM_CENTER);
@@ -34,8 +35,8 @@ pub fn respawn(self: *Self, player_center: rl.Vector2) void {
         final_approx_transform = rutils.find_nearest_rect_inside_world(final_approx_transform);
         final_pos = rutils.rect_pos(final_approx_transform);
     }
-    const start_pos = rutils.new_vector2(final_pos.x, final_pos.y - Background.transform.height / 4);
-    const transform = rutils.new_rect_with_pos(start_pos, SIZE, SIZE);
+    const start_pos = rutils.new_vector2(final_pos.x + Background.transform.width / 4, final_pos.y - Background.transform.height / 4);
+    const transform = rutils.new_rect_with_center_pos(start_pos, SIZE, SIZE);
 
     self.explosion_color_alpha = 1;
     self.is_falling = true;
@@ -47,6 +48,8 @@ pub fn respawn(self: *Self, player_center: rl.Vector2) void {
 fn animate_falling(self: *Self, last_frame_time: f32) void {
     self.rotation += rutils.px_per_sec(300, last_frame_time);
     self.transform.y += rutils.px_per_sec(600, last_frame_time);
+    self.transform.x -= rutils.px_per_sec(400, last_frame_time);
+    self.falling_animation.update();
 }
 
 fn animate_explosion(self: *Self, last_frame_time: f32) void {
@@ -56,7 +59,8 @@ fn animate_explosion(self: *Self, last_frame_time: f32) void {
         const delta = rutils.px_per_sec(100, last_frame_time);
         self.transform = rutils.grow_rect_from_center(self.transform, -delta, -delta);
     } else {
-        self.transform = rutils.grow_rect_from_center(self.transform, self.transform.width * EXPLOSION_SCALE, self.transform.height * EXPLOSION_SCALE);
+        const transform_center = rutils.calc_rect_center(self.transform);
+        self.transform = rutils.new_rect_with_center_pos(transform_center, EXPLOSION_SIZE, EXPLOSION_SIZE);
         self.explosion_collider = self.transform;
         self.is_exploded = true;
     }
@@ -89,5 +93,9 @@ pub fn update(self: *Self) void {
 }
 
 pub fn draw(self: *const Self) void {
-    rl.DrawRectanglePro(self.transform, rutils.new_vector2(SIZE / 2, SIZE / 2), self.rotation, rl.ColorAlpha(rl.RED, self.explosion_color_alpha));
+    if (self.is_explosion) {
+        rl.DrawRectanglePro(self.transform, rutils.new_vector2(SIZE / 2, SIZE / 2), self.rotation, rl.ColorAlpha(rl.RED, self.explosion_color_alpha));
+    } else if (self.is_falling) {
+        self.falling_animation.draw_rotation(self.transform, rl.WHITE, self.rotation);
+    }
 }
