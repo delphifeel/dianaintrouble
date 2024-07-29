@@ -9,7 +9,7 @@ const Text = @import("gui/text.zig");
 const Progressbar = @import("gui/progressbar.zig");
 const Entity = @import("entity.zig");
 const Background = @import("background.zig");
-const Animation = @import("animation.zig");
+const SpriteAnimation = @import("sprite_animation.zig");
 
 const fonts = @import("gui/fonts.zig");
 const screen = @import("screen.zig");
@@ -27,8 +27,8 @@ const Moon = @import("player_skills/moon.zig");
 const Self = @This();
 
 entity: Entity,
-run_animation: Animation,
-idle_animation: Animation,
+run_animation: SpriteAnimation,
+idle_animation: SpriteAnimation,
 exp: f32,
 lvl: u32,
 hp_bar: Progressbar,

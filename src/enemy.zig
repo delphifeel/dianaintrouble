@@ -7,12 +7,12 @@ const helpers = @import("helpers.zig");
 const rutils = @import("rutils.zig");
 // ---+---+---+---+---+---
 const Entity = @import("entity.zig");
-const Animation = @import("animation.zig");
+const SpriteAnimation = @import("sprite_animation.zig");
 
 const Self = @This();
 
 entity: Entity,
-walk_animation: Animation,
+walk_animation: SpriteAnimation,
 
 transform: rl.Rectangle = undefined,
 
