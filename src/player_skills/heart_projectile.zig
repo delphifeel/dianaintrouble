@@ -18,7 +18,7 @@ speed: f32 = 250,
 offset_from_center: f32 = DEFAULT_OFFSET_FROM_CENTER,
 
 const DEFAULT_OFFSET_FROM_CENTER: comptime_float = 150;
-const SIZE: f32 = 40;
+const SIZE: f32 = 50;
 const INIT_ANGLE: comptime_float = 270;
 
 pub fn init(player_center: rl.Vector2) Self {
