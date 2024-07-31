@@ -64,7 +64,7 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
     var skills = std.ArrayList(skillsInfo.SkillId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
     // default skills
     skills.append(.Heart) catch h.oom();
-    skills.append(.Meteors) catch h.oom();
+    skills.append(.Knight) catch h.oom();
     const upgrades = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
 
     const texture_run = rl.LoadTexture("assets/character_run.png");
@@ -301,10 +301,13 @@ pub fn draw(self: *const Self) void {
     } else {
         self.idle_animation.draw(self.transform, self.entity.sprite_tint_color);
     }
-    self.draw_hp_bar();
 }
 
-fn draw_hp_bar(self: *const Self) void {
+pub fn draw_exp_progress(self: *const Self) void {
+    self.exp_progressbar.draw(self.exp, self.exp_needed_for_lvl);
+}
+
+pub fn draw_hp_bar(self: *const Self) void {
     const hp_f: f32 = @floatFromInt(self.entity.health);
     const max_hp_f: f32 = @floatFromInt(self.entity.max_health);
     self.hp_bar.draw(hp_f, max_hp_f);
@@ -322,10 +325,6 @@ fn calc_hp_bar_transform(player_center: rl.Vector2) rl.Rectangle {
     var pos = player_center;
     pos.y -= 80;
     return rutils.new_rect_with_center_pos(pos, 70, 12);
-}
-
-pub fn draw_exp_progress(self: *const Self) void {
-    self.exp_progressbar.draw(self.exp, self.exp_needed_for_lvl);
 }
 
 fn init_exp_bar() Progressbar {

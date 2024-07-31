@@ -99,6 +99,7 @@ pub fn main() !void {
             player.draw_skills();
             // TODO: hit text as sep. module
             player.entity.draw_hit_text();
+            player.draw_hp_bar();
         }
         rl.EndMode2D();
 

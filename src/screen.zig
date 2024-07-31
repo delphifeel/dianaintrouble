@@ -5,12 +5,14 @@ const rutils = @import("rutils.zig");
 // pub const width: f32 = 1920;
 // pub const height: f32 = 1080;
 
-// pub const width: f32 = 1600;
-// pub const height: f32 = 900;
-pub const width: f32 = 1200;
-pub const height: f32 = 675;
+pub const width: f32 = 1600;
+pub const height: f32 = 900;
+// pub const width: f32 = 1200;
+// pub const height: f32 = 675;
 // pub const width: f32 = 600;
 // pub const height: f32 = 340;
+// pub const width: f32 = 200;
+// pub const height: f32 = 100;
 
 pub const camera_zoom: f32 = width / (Background.transform.width / 2);
 
