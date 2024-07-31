@@ -15,41 +15,15 @@ collider: rl.Rectangle,
 direction: i32 = 0,
 transform: rl.Rectangle = undefined,
 time_passed: f32 = 0,
-dmg: f32 = 10,
+dmg: f32 = 1,
 rotation_timeout: f32 = 10,
 size: f32 = DEFAULT_SIZE,
 
+const PUSH_FORCE = 10;
 const DEFAULT_SIZE = 96;
 const COLLIDER_WIDTH = 64;
 const OFFSET_VERTICAL = 150;
 const OFFSET_HORIZONTAL = 100;
-
-fn calc_transform(player_center: rl.Vector2, direction: i32, size: f32) rl.Rectangle {
-    var pos = player_center;
-    var width: f32 = size;
-    var height: f32 = size;
-    switch (direction) {
-        // left
-        0 => pos.x -= OFFSET_HORIZONTAL,
-        // top
-        1 => {
-            pos.y -= OFFSET_VERTICAL;
-        },
-        // right
-        2 => pos.x += OFFSET_HORIZONTAL,
-        // bottom
-        3 => {
-            pos.y += OFFSET_VERTICAL;
-        },
-        else => unreachable,
-    }
-    return rutils.new_rect_with_center_pos(pos, width, height);
-}
-
-inline fn calc_collider(transform: rl.Rectangle) rl.Rectangle {
-    const center_pos = rutils.calc_rect_center(transform);
-    return rutils.new_rect_with_center_pos(center_pos, COLLIDER_WIDTH, DEFAULT_SIZE);
-}
 
 pub fn init(player_center: rl.Vector2) Self {
     const transform = calc_transform(player_center, 0, DEFAULT_SIZE);
@@ -86,4 +60,49 @@ pub fn update(self: *Self, player_center: rl.Vector2) void {
 pub fn draw(self: *const Self) void {
     self.animation.draw(self.transform, rl.WHITE);
     // rutils.draw_collider(self.collider);
+}
+
+pub fn calc_push_vector(self: *const Self) rl.Vector2 {
+    var vector = rm.Vector2Zero();
+    switch (self.direction) {
+        // left
+        0 => vector.x -= PUSH_FORCE,
+        // top
+        1 => {
+            vector.y -= PUSH_FORCE;
+        },
+        // right
+        2 => vector.x += PUSH_FORCE,
+        // bottom
+        3 => vector.y += PUSH_FORCE,
+        else => unreachable,
+    }
+    return vector;
+}
+
+fn calc_transform(player_center: rl.Vector2, direction: i32, size: f32) rl.Rectangle {
+    var pos = player_center;
+    var width: f32 = size;
+    var height: f32 = size;
+    switch (direction) {
+        // left
+        0 => pos.x -= OFFSET_HORIZONTAL,
+        // top
+        1 => {
+            pos.y -= OFFSET_VERTICAL;
+        },
+        // right
+        2 => pos.x += OFFSET_HORIZONTAL,
+        // bottom
+        3 => {
+            pos.y += OFFSET_VERTICAL;
+        },
+        else => unreachable,
+    }
+    return rutils.new_rect_with_center_pos(pos, width, height);
+}
+
+inline fn calc_collider(transform: rl.Rectangle) rl.Rectangle {
+    const center_pos = rutils.calc_rect_center(transform);
+    return rutils.new_rect_with_center_pos(center_pos, COLLIDER_WIDTH, DEFAULT_SIZE);
 }

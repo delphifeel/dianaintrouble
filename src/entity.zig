@@ -33,7 +33,6 @@ hit_text_x_offset: f32 = 0,
 
 const HIT_TIMEOUT: comptime_float = 0.4;
 const HIT_TEXT_SPEED: comptime_float = 200;
-
 const COLLIDER_WIDTH: comptime_float = 40;
 const COLLIDER_HEIGHT: comptime_float = 80;
 
@@ -98,6 +97,19 @@ pub fn try_hit(self: *Self, dmg: f32) void {
     if (self.is_invurnable) {
         return;
     }
+
+    self.hit(dmg);
+}
+
+pub fn try_hit_and_push(self: *Self, dmg: f32, vector: rl.Vector2) void {
+    if (self.health <= 0) {
+        return;
+    }
+    if (self.is_invurnable) {
+        return;
+    }
+
+    self.collider = rutils.move_rect(self.collider, vector);
 
     self.hit(dmg);
 }

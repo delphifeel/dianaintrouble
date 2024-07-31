@@ -63,7 +63,7 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
 
     var skills = std.ArrayList(skillsInfo.SkillId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
     // default skills
-    skills.append(.Heart) catch h.oom();
+    // skills.append(.Heart) catch h.oom();
     skills.append(.Knight) catch h.oom();
     const upgrades = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
 
@@ -113,6 +113,8 @@ pub fn deinit(self: *Self) void {
 
 pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
     var dmg_sum: f32 = 0;
+    var need_to_push = false;
+    var push_vector = rm.Vector2Zero();
 
     for (self.active_skills.items) |skill_id| {
         switch (skill_id) {
@@ -128,6 +130,8 @@ pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
             .Knight => {
                 if (rl.CheckCollisionRecs(enemy_entity.collider, self.knight.collider)) {
                     dmg_sum += self.knight.dmg;
+                    need_to_push = true;
+                    push_vector = self.knight.calc_push_vector();
                 }
             },
             .Heart => {
@@ -153,7 +157,12 @@ pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
     }
 
     if (dmg_sum > 0) {
-        enemy_entity.try_hit(dmg_sum);
+        if (need_to_push) {
+            enemy_entity.try_hit_and_push(dmg_sum, push_vector);
+        } else {
+            enemy_entity.try_hit(dmg_sum);
+        }
+
         if (enemy_entity.is_dead) {
             self.up_exp();
         }
