@@ -126,9 +126,11 @@ pub fn hit_enemy_with_skills(self: *Self, enemy_entity: *Entity) void {
                     dmg_sum += self.moon.dmg;
                 }
             },
-
             .Knight => {
                 if (rl.CheckCollisionRecs(enemy_entity.collider, self.knight.collider)) {
+                    if (!self.knight.is_attacking) {
+                        self.knight.play_attack_animation();
+                    }
                     dmg_sum += self.knight.dmg;
                     need_to_push = true;
                     push_vector = self.knight.calc_push_vector();
@@ -192,7 +194,7 @@ pub fn add_upgrade(self: *Self, id: skillsInfo.UpgradeId) void {
 
         .KnightStronger => self.knight.dmg *= 1.1,
         .KnightFasterRotation => self.knight.rotation_timeout *= 0.9,
-        .KnightBigger => self.knight.size *= 1.1,
+        .KnightBigger => self.knight.scale += 0.1,
 
         .HeartRange => self.heart_projectile.offset_from_center *= 1.1,
         .HeartFaster => self.heart_projectile.speed *= 1.1,

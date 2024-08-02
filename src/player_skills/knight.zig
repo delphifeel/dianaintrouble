@@ -8,38 +8,51 @@ const SpriteAnimation = @import("../sprite_animation.zig");
 
 const Self = @This();
 
-animation: SpriteAnimation,
+idle_animation: SpriteAnimation,
+attack_animation: SpriteAnimation,
 collider: rl.Rectangle,
 
 // TODO: enum
 direction: i32 = 0,
+is_attacking: bool = false,
+stop_attacking_next_frame: bool = false,
 transform: rl.Rectangle = undefined,
 time_passed: f32 = 0,
 dmg: f32 = 1,
 rotation_timeout: f32 = 10,
-size: f32 = DEFAULT_SIZE,
+scale: f32 = DEFAULT_SCALE,
 
+const DEFAULT_SCALE = 1.4;
 const PUSH_FORCE = 10;
-const DEFAULT_SIZE = 96;
-const COLLIDER_WIDTH = 64;
+const WIDTH = 100;
+const HEIGHT = 64;
+const COLLIDER_WIDTH = 80;
+const COLLIDER_HEIGHT = 64;
 const OFFSET_VERTICAL = 150;
 const OFFSET_HORIZONTAL = 100;
 
 pub fn init(player_center: rl.Vector2) Self {
-    const transform = calc_transform(player_center, 0, DEFAULT_SIZE);
+    const transform = calc_transform(player_center, 0, DEFAULT_SCALE);
     return Self{
-        .animation = .{
-            .texture = rl.LoadTexture("assets/knight.png"),
-            .speed = 0.1,
-            .sprite_width = 32,
+        .idle_animation = .{
+            .texture = rl.LoadTexture("assets/knight_idle.png"),
+            .speed = 0.2,
+            .sprite_width = 100,
+            .is_flip = true,
+        },
+        .attack_animation = .{
+            .texture = rl.LoadTexture("assets/knight_bash.png"),
+            .speed = 0.2,
+            .sprite_width = 100,
+            .is_flip = true,
         },
         .transform = transform,
-        .collider = calc_collider(transform),
+        .collider = calc_collider(transform, DEFAULT_SCALE),
     };
 }
 
 pub fn deinit(self: *Self) void {
-    rl.UnloadTexture(self.animation.texture);
+    rl.UnloadTexture(self.idle_animation.texture);
 }
 
 pub fn update(self: *Self, player_center: rl.Vector2) void {
@@ -47,19 +60,53 @@ pub fn update(self: *Self, player_center: rl.Vector2) void {
     if (self.time_passed >= self.rotation_timeout) {
         self.time_passed = 0;
         self.direction += 1;
-        if (self.direction == 4) {
+        if (self.direction == 2) {
             self.direction = 0;
         }
     }
 
-    self.transform = calc_transform(player_center, self.direction, self.size);
-    self.collider = calc_collider(self.transform);
-    self.animation.update();
+    self.transform = calc_transform(player_center, self.direction, self.scale);
+    self.collider = calc_collider(self.transform, self.scale);
+
+    var is_flip = false;
+    switch (self.direction) {
+        // left
+        0 => is_flip = true,
+        // right
+        1 => is_flip = false,
+        else => unreachable,
+    }
+
+    if (self.stop_attacking_next_frame) {
+        self.stop_attacking_next_frame = false;
+        self.is_attacking = false;
+        self.idle_animation.reset();
+    }
+
+    if (self.is_attacking) {
+        self.attack_animation.is_flip = is_flip;
+        self.attack_animation.update();
+        if (self.attack_animation.is_finished) {
+            self.stop_attacking_next_frame = true;
+        }
+    } else {
+        self.idle_animation.is_flip = is_flip;
+        self.idle_animation.update();
+    }
 }
 
 pub fn draw(self: *const Self) void {
-    self.animation.draw(self.transform, rl.WHITE);
+    if (self.is_attacking) {
+        self.attack_animation.draw(self.transform, rl.WHITE);
+    } else {
+        self.idle_animation.draw(self.transform, rl.WHITE);
+    }
     // rutils.draw_collider(self.collider);
+}
+
+pub fn play_attack_animation(self: *Self) void {
+    self.attack_animation.reset();
+    self.is_attacking = true;
 }
 
 pub fn calc_push_vector(self: *const Self) rl.Vector2 {
@@ -67,42 +114,28 @@ pub fn calc_push_vector(self: *const Self) rl.Vector2 {
     switch (self.direction) {
         // left
         0 => vector.x -= PUSH_FORCE,
-        // top
-        1 => {
-            vector.y -= PUSH_FORCE;
-        },
         // right
-        2 => vector.x += PUSH_FORCE,
-        // bottom
-        3 => vector.y += PUSH_FORCE,
+        1 => vector.x += PUSH_FORCE,
         else => unreachable,
     }
     return vector;
 }
 
-fn calc_transform(player_center: rl.Vector2, direction: i32, size: f32) rl.Rectangle {
+fn calc_transform(player_center: rl.Vector2, direction: i32, scale: f32) rl.Rectangle {
     var pos = player_center;
-    var width: f32 = size;
-    var height: f32 = size;
+    var width: f32 = WIDTH * scale;
+    var height: f32 = HEIGHT * scale;
     switch (direction) {
         // left
         0 => pos.x -= OFFSET_HORIZONTAL,
-        // top
-        1 => {
-            pos.y -= OFFSET_VERTICAL;
-        },
         // right
-        2 => pos.x += OFFSET_HORIZONTAL,
-        // bottom
-        3 => {
-            pos.y += OFFSET_VERTICAL;
-        },
+        1 => pos.x += OFFSET_HORIZONTAL,
         else => unreachable,
     }
     return rutils.new_rect_with_center_pos(pos, width, height);
 }
 
-inline fn calc_collider(transform: rl.Rectangle) rl.Rectangle {
+inline fn calc_collider(transform: rl.Rectangle, scale: f32) rl.Rectangle {
     const center_pos = rutils.calc_rect_center(transform);
-    return rutils.new_rect_with_center_pos(center_pos, COLLIDER_WIDTH, DEFAULT_SIZE);
+    return rutils.new_rect_with_center_pos(center_pos, COLLIDER_WIDTH * scale, COLLIDER_HEIGHT * scale);
 }

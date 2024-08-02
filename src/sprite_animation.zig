@@ -10,6 +10,7 @@ texture: rl.Texture2D,
 speed: f32,
 sprite_width: f32,
 
+is_finished: bool = false,
 is_flip: bool = false,
 sprite_src_rect: rl.Rectangle = undefined,
 sprite_index: u32 = 0,
@@ -18,6 +19,7 @@ time_passed: f32 = 0,
 pub fn reset(self: *Self) void {
     self.time_passed = 0;
     self.sprite_index = 0;
+    self.is_finished = false;
 }
 
 pub fn update(self: *Self) void {
@@ -31,9 +33,11 @@ pub fn update(self: *Self) void {
     if (self.time_passed >= self.speed) {
         self.time_passed = 0;
         self.sprite_index += 1;
+        self.is_finished = false;
         const sprites_count_i: u32 = @intFromFloat(sprites_count);
         if (self.sprite_index == sprites_count_i) {
             self.sprite_index = 0;
+            self.is_finished = true;
         }
     }
 
