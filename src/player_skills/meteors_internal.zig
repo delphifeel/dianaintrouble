@@ -58,7 +58,9 @@ fn animate_explosion(self: *Self, last_frame_time: f32) void {
         self.explosion_collider = null;
         const delta = rutils.px_per_sec(100, last_frame_time);
         self.transform = rutils.grow_rect_from_center(self.transform, -delta, -delta);
-        self.explosion_animation.update();
+        if (!self.explosion_animation.is_finished) {
+            self.explosion_animation.update();
+        }
     } else {
         const transform_center = rutils.calc_rect_center(self.transform);
         self.transform = rutils.new_rect_with_center_pos(transform_center, EXPLOSION_SIZE, EXPLOSION_SIZE);
@@ -76,7 +78,6 @@ pub fn update(self: *Self) void {
             self.time_passed = 0;
             self.rotation = 0;
             self.is_explosion = true;
-            self.explosion_animation.reset();
             self.is_falling = false;
         }
         return;
@@ -95,7 +96,7 @@ pub fn update(self: *Self) void {
 }
 
 pub fn draw(self: *const Self) void {
-    if (self.is_explosion) {
+    if (self.is_explosion and !self.explosion_animation.is_finished) {
         self.explosion_animation.draw(self.transform, rl.WHITE);
     } else if (self.is_falling) {
         self.falling_animation.draw_rotation(self.transform, rl.WHITE, self.rotation);

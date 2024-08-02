@@ -32,7 +32,7 @@ pub fn init(allocator: std.mem.Allocator) Self {
             },
             .explosion_animation = .{
                 .texture = explosion_texture,
-                .speed = 0.2,
+                .speed = 0.1,
                 .sprite_width = 32,
             },
         }) catch h.oom();
