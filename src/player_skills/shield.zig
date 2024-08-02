@@ -10,7 +10,7 @@ const Self = @This();
 transform: ?rl.Rectangle,
 
 time_passed: f32 = 0,
-restore_amount: f32 = 5,
+restore_amount: f32 = 50,
 restore_timeout: f32 = 10,
 
 const SIZE = 20;

@@ -18,7 +18,7 @@ is_attacking: bool = false,
 stop_attacking_next_frame: bool = false,
 transform: rl.Rectangle = undefined,
 time_passed: f32 = 0,
-dmg: f32 = 1,
+dmg: f32 = 30,
 rotation_timeout: f32 = 10,
 scale: f32 = DEFAULT_SCALE,
 

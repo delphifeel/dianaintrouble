@@ -10,7 +10,7 @@ const Self = @This();
 center: rl.Vector2,
 
 radius: f32 = 100,
-dmg: f32 = 1,
+dmg: f32 = 20,
 
 pub fn init(player_center: rl.Vector2) Self {
     return Self{

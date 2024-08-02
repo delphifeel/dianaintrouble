@@ -16,8 +16,8 @@ walk_animation: SpriteAnimation,
 
 transform: rl.Rectangle = undefined,
 
-const DMG = 2;
-const HEALTH = 20;
+const DMG = 20;
+const HEALTH = 200;
 const MOVE_SPEED = 50;
 
 const ANIMATION_SPEED: comptime_float = 0.1;

@@ -10,7 +10,7 @@ const Self = @This();
 transforms: [4]rl.Rectangle = undefined,
 colliders: [4]rl.Rectangle = undefined,
 time_passed: f32 = 0,
-dmg: f32 = 10,
+dmg: f32 = 100,
 // TODO: make constant
 speed: f32 = 400,
 fire_timeout: f32 = 3,

@@ -12,7 +12,7 @@ falling_texture: rl.Texture2D,
 time_passed: f32,
 list: std.ArrayList(Meteor),
 
-dmg: f32 = 40,
+dmg: f32 = 400,
 spawn_timeout: f32 = 3,
 
 const MAX_METEORS = 100;

@@ -13,7 +13,7 @@ transform: rl.Rectangle,
 collider: rl.Rectangle,
 angle: f32,
 
-dmg: f32 = 10,
+dmg: f32 = 100,
 speed: f32 = 250,
 offset_from_center: f32 = DEFAULT_OFFSET_FROM_CENTER,
 

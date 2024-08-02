@@ -51,7 +51,7 @@ shield_skill: Shield,
 
 const DEFAULT_SKILLS_ARRAY_CAP = 100;
 // const START_HEALTH = 200;
-const START_HEALTH = 40;
+const START_HEALTH = 400;
 const MOVE_SPEED: comptime_float = 200;
 
 const ANIMATION_SPEED: comptime_float = 0.1;
@@ -63,8 +63,8 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
 
     var skills = std.ArrayList(skillsInfo.SkillId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
     // default skills
-    // skills.append(.Heart) catch h.oom();
-    skills.append(.Knight) catch h.oom();
+    skills.append(.Heart) catch h.oom();
+    // skills.append(.Knight) catch h.oom();
     const upgrades = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
 
     const texture_run = rl.LoadTexture("assets/character_run.png");
@@ -201,8 +201,8 @@ pub fn add_upgrade(self: *Self, id: skillsInfo.UpgradeId) void {
         .HeartStronger => self.heart_projectile.dmg *= 1.1,
 
         .ShieldEndurence => {
-            self.entity.health += 1;
-            self.entity.max_health += 1;
+            self.entity.health += 10;
+            self.entity.max_health += 10;
         },
         .ShieldFasterRestore => self.shield_skill.restore_timeout *= 0.9,
 
@@ -220,7 +220,7 @@ fn up_exp(self: *Self) void {
     if (self.exp > self.exp_needed_for_lvl) {
         self.exp = 0;
         self.lvl += 1;
-        self.exp_needed_for_lvl *= 1.3;
+        self.exp_needed_for_lvl *= 1.1;
         player_lvlup_ui.show(self.lvl);
     }
 }
