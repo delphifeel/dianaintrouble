@@ -15,7 +15,6 @@ explosion_animation: SpriteAnimation,
 is_falling: bool = false,
 is_explosion: bool = false,
 is_exploded: bool = false,
-explosion_color_alpha: f32 = 1,
 done: bool = true,
 final_pos: rl.Vector2 = undefined,
 transform: rl.Rectangle = undefined,
@@ -39,7 +38,6 @@ pub fn respawn(self: *Self, player_center: rl.Vector2) void {
     const start_pos = rutils.new_vector2(final_pos.x + Background.transform.width / 4, final_pos.y - Background.transform.height / 4);
     const transform = rutils.new_rect_with_center_pos(start_pos, SIZE, SIZE);
 
-    self.explosion_color_alpha = 1;
     self.explosion_animation.reset();
     self.falling_animation.reset();
     self.is_falling = true;
@@ -58,7 +56,6 @@ fn animate_falling(self: *Self, last_frame_time: f32) void {
 fn animate_explosion(self: *Self, last_frame_time: f32) void {
     if (self.is_exploded) {
         self.explosion_collider = null;
-        self.explosion_color_alpha -= rutils.px_per_sec(1, last_frame_time);
         const delta = rutils.px_per_sec(100, last_frame_time);
         self.transform = rutils.grow_rect_from_center(self.transform, -delta, -delta);
         self.explosion_animation.update();
