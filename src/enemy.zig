@@ -17,14 +17,14 @@ walk_animation: SpriteAnimation,
 transform: rl.Rectangle = undefined,
 
 const DMG = 20;
-const HEALTH = 200;
+pub const DEFAULT_HEALTH = 200;
 const MOVE_SPEED = 50;
 
-const ANIMATION_SPEED: comptime_float = 0.1;
-const SPRITE_DEST_SIZE: comptime_float = 200;
+const ANIMATION_SPEED = 0.1;
+const SPRITE_DEST_SIZE = 200.0;
 
-pub fn init(pos: rl.Vector2) Self {
-    const entity = Entity.init(pos, HEALTH, rl.GREEN);
+pub fn init(pos: rl.Vector2, start_health: i32) Self {
+    const entity = Entity.init(pos, start_health, rl.GREEN);
     const texture = rl.LoadTexture("assets/enemy_walk.png");
     return Self{
         .entity = entity,

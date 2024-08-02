@@ -220,7 +220,7 @@ fn up_exp(self: *Self) void {
     if (self.exp > self.exp_needed_for_lvl) {
         self.exp = 0;
         self.lvl += 1;
-        self.exp_needed_for_lvl *= 1.1;
+        self.exp_needed_for_lvl *= 1.2;
         player_lvlup_ui.show(self.lvl);
     }
 }

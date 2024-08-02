@@ -18,11 +18,12 @@ time_passed: f32,
 
 // DEBUG
 // const START_ENEMIES_COUNT: f32 = 400;
-// const RESPAWN_COUNT_INC = 100;
+// const RESPAWN_COUNT_INCREASE = 100;
 
 var maxEnemiesPerRespawn: i32 = START_ENEMIES_COUNT;
+var next_spawn_start_health: i32 = Enemy.DEFAULT_HEALTH;
 const START_ENEMIES_COUNT: f32 = 40;
-const RESPAWN_COUNT_INC = 1;
+const RESPAWN_COUNT_INCREASE = 1;
 const MIN_OFFSET: f32 = 700;
 const MAX_OFFSET: f32 = 900;
 const SPAWN_EVERY: f32 = 10;
@@ -33,7 +34,7 @@ pub fn spawn(allocator: std.mem.Allocator, player_center: rl.Vector2) Enemies {
     var i: i32 = 0;
     while (i < START_ENEMIES_COUNT) {
         const rand_pos = rutils.rand_coord_in_range(player_center, MIN_OFFSET, MAX_OFFSET);
-        var enemy = Enemy.init(rand_pos);
+        var enemy = Enemy.init(rand_pos, Enemy.DEFAULT_HEALTH);
         enemies.append(enemy) catch h.oom();
 
         i += 1;
@@ -55,7 +56,9 @@ pub fn update(self: *Enemies, player: *Player) void {
     if (self.time_passed >= SPAWN_EVERY) {
         self.time_passed = 0;
         need_to_spawn = true;
-        maxEnemiesPerRespawn += RESPAWN_COUNT_INC;
+        maxEnemiesPerRespawn += RESPAWN_COUNT_INCREASE;
+        const next_spawn_start_health_f: f32 = @floatFromInt(next_spawn_start_health);
+        next_spawn_start_health = @intFromFloat(next_spawn_start_health_f * 1.3);
     }
 
     for (self.list.items, 0..) |*enemy, i| {
@@ -63,7 +66,7 @@ pub fn update(self: *Enemies, player: *Player) void {
             if (need_to_spawn and respawnedCount < maxEnemiesPerRespawn) {
                 respawnedCount += 1;
                 const rand_pos = rutils.rand_coord_in_range(player.entity.position_center, MIN_OFFSET, MAX_OFFSET);
-                self.list.items[i] = Enemy.init(rand_pos);
+                self.list.items[i] = Enemy.init(rand_pos, next_spawn_start_health);
             }
         } else {
             player.hit_enemy_with_skills(&enemy.entity);
@@ -76,7 +79,7 @@ pub fn update(self: *Enemies, player: *Player) void {
         while (respawnedCount < maxEnemiesPerRespawn) {
             respawnedCount += 1;
             const rand_pos = rutils.rand_coord_in_range(player.entity.position_center, MIN_OFFSET, MAX_OFFSET);
-            var enemy = Enemy.init(rand_pos);
+            var enemy = Enemy.init(rand_pos, next_spawn_start_health);
             self.list.append(enemy) catch h.oom();
         }
     }
