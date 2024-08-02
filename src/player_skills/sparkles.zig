@@ -4,8 +4,11 @@ const rm = @import("../raymath.zig");
 const rutils = @import("../rutils.zig");
 
 const Player = @import("../player.zig");
+const SpriteAnimation = @import("../sprite_animation.zig");
 
 const Self = @This();
+
+animation: SpriteAnimation,
 
 transforms: [4]rl.Rectangle = undefined,
 colliders: [4]rl.Rectangle = undefined,
@@ -31,13 +34,21 @@ fn reset(self: *Self, player_center: rl.Vector2) void {
 }
 
 pub fn init(player_center: rl.Vector2) Self {
-    var self: Self = .{};
+    var self: Self = .{
+        .animation = .{
+            .texture = rl.LoadTexture("assets/sparkles.png"),
+            .speed = 0.1,
+            .sprite_width = 32,
+        },
+    };
     self.reset(player_center);
 
     return self;
 }
 
-pub fn deinit(_: *Self) void {}
+pub fn deinit(self: *Self) void {
+    rl.UnloadTexture(self.animation.texture);
+}
 
 pub fn is_collides(self: *const Self, target_rect: rl.Rectangle) bool {
     for (self.colliders) |collider| {
@@ -62,11 +73,13 @@ pub fn update(self: *Self, player_center: rl.Vector2) void {
     self.move_sparkle(1, rutils.new_vector2(distance, -distance));
     self.move_sparkle(2, rutils.new_vector2(distance, distance));
     self.move_sparkle(3, rutils.new_vector2(-distance, distance));
+
+    self.animation.update();
 }
 
 pub fn draw(self: *const Self) void {
     for (self.transforms) |t| {
-        rl.DrawRectangleRec(t, rl.YELLOW);
+        self.animation.draw(t, rl.WHITE);
     }
 }
 

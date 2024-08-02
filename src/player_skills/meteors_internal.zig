@@ -103,4 +103,8 @@ pub fn draw(self: *const Self) void {
     } else if (self.is_falling) {
         self.falling_animation.draw_rotation(self.transform, rl.WHITE, self.rotation);
     }
+
+    if (self.explosion_collider) |collider| {
+        rutils.draw_collider(collider);
+    }
 }

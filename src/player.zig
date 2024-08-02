@@ -65,6 +65,7 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
     // default skills
     skills.append(.Heart) catch h.oom();
     skills.append(.Meteors) catch h.oom();
+    skills.append(.Sparkles) catch h.oom();
     const upgrades = std.ArrayList(skillsInfo.UpgradeId).initCapacity(allocator, DEFAULT_SKILLS_ARRAY_CAP) catch h.oom();
 
     const texture_run = rl.LoadTexture("assets/character_run.png");
