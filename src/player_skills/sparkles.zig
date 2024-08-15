@@ -16,7 +16,7 @@ time_passed: f32 = 0,
 dmg: f32 = 100,
 // TODO: make constant
 speed: f32 = 400,
-fire_timeout: f32 = 3,
+reload_speed: f32 = 1,
 size: f32 = 50,
 
 const OFFSET_FROM_CENTER: f32 = 50;
@@ -62,7 +62,8 @@ pub fn is_collides(self: *const Self, target_rect: rl.Rectangle) bool {
 pub fn update(self: *Self, player_center: rl.Vector2) void {
     const frame_time = rl.GetFrameTime();
     self.time_passed += frame_time;
-    if (self.time_passed >= self.fire_timeout) {
+    const fire_timeout = 3 / self.reload_speed;
+    if (self.time_passed >= fire_timeout) {
         self.time_passed = 0;
         self.reset(player_center);
     }

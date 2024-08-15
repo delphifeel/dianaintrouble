@@ -19,7 +19,7 @@ stop_attacking_next_frame: bool = false,
 transform: rl.Rectangle = undefined,
 time_passed: f32 = 0,
 dmg: f32 = 30,
-rotation_timeout: f32 = 10,
+rotation_speed: f32 = 1,
 scale: f32 = DEFAULT_SCALE,
 
 const DEFAULT_SCALE = 1.4;
@@ -57,7 +57,8 @@ pub fn deinit(self: *Self) void {
 
 pub fn update(self: *Self, player_center: rl.Vector2) void {
     self.time_passed += rl.GetFrameTime();
-    if (self.time_passed >= self.rotation_timeout) {
+    const rotation_timeout = 10.0 / self.rotation_speed;
+    if (self.time_passed >= rotation_timeout) {
         self.time_passed = 0;
         self.direction += 1;
         if (self.direction == 2) {

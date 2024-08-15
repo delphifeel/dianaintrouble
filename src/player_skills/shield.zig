@@ -11,7 +11,7 @@ transform: ?rl.Rectangle,
 
 time_passed: f32 = 0,
 restore_amount: f32 = 50,
-restore_timeout: f32 = 10,
+restore_speed: f32 = 1,
 
 const SIZE = 20;
 
@@ -34,7 +34,8 @@ pub fn update(self: *Self, player: *Player) void {
     if (player.entity.shield == 0) {
         self.time_passed += rl.GetFrameTime();
     }
-    if (self.time_passed >= self.restore_timeout) {
+    const restore_timeout = 10 / self.restore_speed;
+    if (self.time_passed >= restore_timeout) {
         self.time_passed = 0;
         player.entity.shield = @intFromFloat(self.restore_amount);
     }

@@ -186,33 +186,40 @@ pub fn add_skill(self: *Self, id: skillsInfo.SkillId) void {
     self.active_skills.append(id) catch h.oom();
 }
 
+const UPGRADE_MULTIPLIER = 1.1;
+
+inline fn multiplyIntFloat(v: i32, mul: f32) i32 {
+    const v_f: f32 = @as(f32, @floatFromInt(v)) * mul;
+    return @intFromFloat(v_f);
+}
+
 pub fn add_upgrade(self: *Self, id: skillsInfo.UpgradeId) void {
     self.active_upgrades.append(id) catch h.oom();
 
     switch (id) {
-        .MoonRange => self.moon.radius *= 1.1,
-        .MoonStronger => self.moon.dmg *= 1.1,
+        .MoonRange => self.moon.radius *= UPGRADE_MULTIPLIER,
+        .MoonStronger => self.moon.dmg *= UPGRADE_MULTIPLIER,
 
-        .KnightStronger => self.knight.dmg *= 1.1,
-        .KnightFasterRotation => self.knight.rotation_timeout *= 0.9,
-        .KnightBigger => self.knight.scale += 0.1,
+        .KnightStronger => self.knight.dmg *= UPGRADE_MULTIPLIER,
+        .KnightFasterRotation => self.knight.rotation_speed *= UPGRADE_MULTIPLIER,
+        .KnightBigger => self.knight.scale *= UPGRADE_MULTIPLIER,
 
-        .HeartRange => self.heart_projectile.offset_from_center *= 1.1,
-        .HeartFaster => self.heart_projectile.speed *= 1.1,
-        .HeartStronger => self.heart_projectile.dmg *= 1.1,
+        .HeartRange => self.heart_projectile.offset_from_center *= UPGRADE_MULTIPLIER,
+        .HeartFaster => self.heart_projectile.speed *= UPGRADE_MULTIPLIER,
+        .HeartStronger => self.heart_projectile.dmg *= UPGRADE_MULTIPLIER,
 
         .ShieldEndurence => {
-            self.entity.health += 10;
-            self.entity.max_health += 10;
+            self.entity.health = multiplyIntFloat(self.entity.health, UPGRADE_MULTIPLIER);
+            self.entity.max_health = multiplyIntFloat(self.entity.max_health, UPGRADE_MULTIPLIER);
         },
-        .ShieldFasterRestore => self.shield_skill.restore_timeout *= 0.9,
+        .ShieldFasterRestore => self.shield_skill.restore_speed *= UPGRADE_MULTIPLIER,
 
-        .SparklesBigger => self.sparkles.size *= 1.3,
-        .SparklesFasterSpawn => self.sparkles.fire_timeout *= 0.9,
-        .SparklesStronger => self.sparkles.dmg *= 1.1,
+        .SparklesBigger => self.sparkles.size *= UPGRADE_MULTIPLIER,
+        .SparklesFasterSpawn => self.sparkles.reload_speed *= UPGRADE_MULTIPLIER,
+        .SparklesStronger => self.sparkles.dmg *= UPGRADE_MULTIPLIER,
 
-        .MeteorsFasterSpawn => self.meteors.spawn_timeout *= 0.9,
-        .MeteorsStronger => self.meteors.dmg *= 1.1,
+        .MeteorsFasterSpawn => self.meteors.respawn_speed *= UPGRADE_MULTIPLIER,
+        .MeteorsStronger => self.meteors.dmg *= UPGRADE_MULTIPLIER,
     }
 }
 

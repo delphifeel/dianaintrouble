@@ -58,7 +58,7 @@ pub fn update(self: *Enemies, player: *Player) void {
         need_to_spawn = true;
         maxEnemiesPerRespawn += RESPAWN_COUNT_INCREASE;
         const next_spawn_start_health_f: f32 = @floatFromInt(next_spawn_start_health);
-        next_spawn_start_health = @intFromFloat(next_spawn_start_health_f * 1.3);
+        next_spawn_start_health = @intFromFloat(next_spawn_start_health_f * 1.1);
     }
 
     for (self.list.items, 0..) |*enemy, i| {
