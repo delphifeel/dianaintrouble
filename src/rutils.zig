@@ -6,6 +6,10 @@ const Background = @import("background.zig");
 
 pub const TARGET_FPS = 120;
 
+pub inline fn f32_from_int(v: anytype) f32 {
+    return @as(f32, @floatFromInt(v));
+}
+
 // TODO: move to collider module
 pub fn draw_collider(collider: rl.Rectangle) void {
     rl.DrawRectangleLinesEx(collider, 2, rl.PURPLE);

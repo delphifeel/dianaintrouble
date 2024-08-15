@@ -20,7 +20,7 @@ health: i32,
 max_health: i32,
 
 // TODO: move outside ?
-sprite_tint_color: rl.Color = rl.WHITE,
+sprite_tint_color: ?rl.Color = null,
 is_flip: bool = false,
 shield: i32 = 0,
 is_dead: bool = false,
@@ -79,15 +79,13 @@ pub fn update(self: *Self, move_offset: rl.Vector2) void {
         }
     }
 
-    self.sprite_tint_color = rl.WHITE;
+    self.sprite_tint_color = null;
     if (self.is_invurnable) {
         self.sprite_tint_color = rl.GRAY;
     } else if (self.is_dead) {
         self.sprite_tint_color = rl.BLACK;
     }
 }
-
-pub fn draw(_: *const Self) void {}
 
 // hit with timeout
 pub fn try_hit(self: *Self, dmg: f32) void {

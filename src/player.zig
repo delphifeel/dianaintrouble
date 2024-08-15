@@ -84,7 +84,7 @@ pub fn init(allocator: std.mem.Allocator, pos: rl.Vector2) Self {
         .entity = entity,
         .heart_projectile = HeartProjectile.init(entity.position_center),
         .sparkles = Sparkles.init(entity.position_center),
-        .shield_skill = Shield.init(entity.position_center),
+        .shield_skill = Shield.init(),
         .knight = Knight.init(entity.position_center),
         .moon = Moon.init(entity.position_center),
         .meteors = meteors,
@@ -189,7 +189,7 @@ pub fn add_skill(self: *Self, id: skillsInfo.SkillId) void {
 const UPGRADE_MULTIPLIER = 1.1;
 
 inline fn multiplyIntFloat(v: i32, mul: f32) i32 {
-    const v_f: f32 = @as(f32, @floatFromInt(v)) * mul;
+    const v_f = rutils.f32_from_int(v) * mul;
     return @intFromFloat(v_f);
 }
 
@@ -314,11 +314,10 @@ pub fn draw_skills(self: *const Self) void {
 }
 
 pub fn draw(self: *const Self) void {
-    self.entity.draw();
     if (self.is_moving) {
-        self.run_animation.draw(self.transform, self.entity.sprite_tint_color);
+        self.run_animation.draw(self.transform, rl.WHITE);
     } else {
-        self.idle_animation.draw(self.transform, self.entity.sprite_tint_color);
+        self.idle_animation.draw(self.transform, rl.WHITE);
     }
 }
 

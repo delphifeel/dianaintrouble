@@ -68,8 +68,44 @@ pub fn update(self: *Self, player_entity: *Entity) void {
     }
 }
 
+inline fn divInts(a: i32, b: i32) f32 {
+    const a_f: f32 = @floatFromInt(a);
+    const b_f: f32 = @floatFromInt(b);
+    return a_f / b_f;
+}
+
+inline fn lerp_color(start: rl.Color, end: rl.Color, percent: f32) rl.Color {
+    var new_color = rl.Color{};
+    new_color.r = @intFromFloat(rm.Lerp(
+        rutils.f32_from_int(start.r),
+        rutils.f32_from_int(end.r),
+        percent,
+    ));
+    new_color.g = @intFromFloat(rm.Lerp(
+        rutils.f32_from_int(start.g),
+        rutils.f32_from_int(end.g),
+        percent,
+    ));
+    new_color.b = @intFromFloat(rm.Lerp(
+        rutils.f32_from_int(start.b),
+        rutils.f32_from_int(end.b),
+        percent,
+    ));
+    new_color.a = @intFromFloat(rm.Lerp(
+        rutils.f32_from_int(start.a),
+        rutils.f32_from_int(end.a),
+        percent,
+    ));
+    return new_color;
+}
+
 pub fn draw(self: *const Self) void {
-    self.entity.draw();
-    self.walk_animation.draw(self.transform, self.entity.sprite_tint_color);
+    var tint_color = self.entity.sprite_tint_color orelse rl.WHITE;
+    if (self.entity.sprite_tint_color == null and self.entity.health != self.entity.max_health) {
+        const hp_percent: f32 = divInts(self.entity.health, self.entity.max_health);
+        tint_color = lerp_color(rl.WHITE, rl.RED, 1 - hp_percent);
+    }
+
+    self.walk_animation.draw(self.transform, tint_color);
     // rutils.draw_collider(self.entity.collider);
 }
