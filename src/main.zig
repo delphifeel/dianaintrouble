@@ -23,6 +23,7 @@ const Player = @import("player.zig");
 const Enemies = @import("enemies.zig");
 
 const screen = @import("screen.zig");
+const game_end_ui = @import("game_end_ui.zig");
 const debug_info = @import("debug_info.zig");
 const rutils = @import("rutils.zig");
 const player_lvlup_ui = @import("player_lvlup_ui.zig");
@@ -91,21 +92,25 @@ pub fn main() !void {
         rl.BeginDrawing();
         rl.ClearBackground(rl.BLACK);
 
-        rl.BeginMode2D(camera);
-        {
-            background.draw();
-            enemies.draw();
-            player.draw();
-            player.draw_skills();
-            // TODO: hit text as sep. module
-            player.entity.draw_hit_text();
-            player.draw_hp_bar();
-        }
-        rl.EndMode2D();
+        if (!player.entity.is_dead) {
+            rl.BeginMode2D(camera);
+            {
+                background.draw();
+                enemies.draw();
+                player.draw();
+                player.draw_skills();
+                // TODO: hit text as sep. module
+                player.entity.draw_hit_text();
+                player.draw_hp_bar();
+            }
+            rl.EndMode2D();
 
-        player.draw_exp_progress();
-        if (player_lvlup_ui.visible) {
-            player_lvlup_ui.draw();
+            player.draw_exp_progress();
+            if (player_lvlup_ui.visible) {
+                player_lvlup_ui.draw();
+            }
+        } else {
+            game_end_ui.draw();
         }
 
         // debug info
